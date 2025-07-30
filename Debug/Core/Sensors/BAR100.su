@@ -1,0 +1,9 @@
+../Core/Sensors/BAR100.c:25:7:Convert_IEE754_To_FloatValue	24	static
+../Core/Sensors/BAR100.c:31:24:BAR100_Calc_Pressure	16	static
+../Core/Sensors/BAR100.c:42:24:BAR100_Init	16	static
+../Core/Sensors/BAR100.c:51:24:BAR100_StartPressureConversion	24	static
+../Core/Sensors/BAR100.c:60:24:BAR100_ReadPressure	24	static
+../Core/Sensors/BAR100.c:84:24:BAR100_Get_ScalingValues	40	static
+../Core/Sensors/BAR100.c:107:24:BAR100_Write	32	static
+../Core/Sensors/BAR100.c:113:24:BAR100_Read	40	static
+../Core/Sensors/BAR100.c:127:24:BAR100_SendReceive	32	static

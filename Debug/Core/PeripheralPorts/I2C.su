@@ -1,0 +1,8 @@
+../Core/PeripheralPorts/I2C.c:21:6:I2C_Init	24	static
+../Core/PeripheralPorts/I2C.c:30:21:I2C_ReadWrite_Poll	40	static
+../Core/PeripheralPorts/I2C.c:51:21:I2C_ReadWrite_DMA	24	static
+../Core/PeripheralPorts/I2C.c:71:21:I2C_ReadWrite_IT	24	static
+../Core/PeripheralPorts/I2C.c:94:22:I2C_GetModule	16	static
+../Core/PeripheralPorts/I2C.c:106:6:I2C_WaitFlag	24	static
+../Core/PeripheralPorts/I2C.c:123:6:HAL_I2C_MasterTxCpltCallback	16	static
+../Core/PeripheralPorts/I2C.c:140:6:HAL_I2C_MasterRxCpltCallback	16	static

@@ -1,0 +1,252 @@
+/*
+ * BNO055.h
+ *
+ *  Created on: Jul 21, 2025
+ *      Author: ggize
+ */
+
+#ifndef SENSORS_BNO055_H_
+#define SENSORS_BNO055_H_
+
+#define BNO055_I2C_ADRESS 0x28
+
+/*********************************************
+ * REGISTERS
+ *********************************************/
+#define BNO055_REG_ADDRESS_CHIP_ID 0x00
+#define BNO055_REG_ADDRESS_ACC_ID 0x01
+#define BNO055_REG_ADDRESS_MAG_ID 0x02
+#define BNO055_REG_ADDRESS_GYR_ID 0x03
+#define BNO055_REG_ADDRESS_ACC_X_DATA_LSB 0x08
+#define BNO055_REG_ADDRESS_ACC_X_DATA_MSB 0x09
+#define BNO055_REG_ADDRESS_ACC_Y_DATA_LSB 0x0A
+#define BNO055_REG_ADDRESS_ACC_Y_DATA_MSB 0x0B
+#define BNO055_REG_ADDRESS_ACC_Z_DATA_LSB 0x0C
+#define BNO055_REG_ADDRESS_ACC_Z_DATA_MSB 0x0D
+#define BNO055_REG_ADDRESS_MAG_X_DATA_LSB 0x0E
+#define BNO055_REG_ADDRESS_MAG_X_DATA_MSB 0x0F
+#define BNO055_REG_ADDRESS_MAG_Y_DATA_LSB 0x10
+#define BNO055_REG_ADDRESS_MAG_Y_DATA_MSB 0x11
+#define BNO055_REG_ADDRESS_MAG_Z_DATA_LSB 0x12
+#define BNO055_REG_ADDRESS_MAG_Z_DATA_MSB 0x13
+#define BNO055_REG_ADDRESS_GYR_X_DATA_LSB 0x14
+#define BNO055_REG_ADDRESS_GYR_X_DATA_MSB 0x15
+#define BNO055_REG_ADDRESS_GYR_Y_DATA_LSB 0x16
+#define BNO055_REG_ADDRESS_GYR_Y_DATA_MSB 0x17
+#define BNO055_REG_ADDRESS_GYR_Z_DATA_LSB 0x18
+#define BNO055_REG_ADDRESS_GYR_Z_DATA_MSB 0x19
+#define BNO055_REG_ADDRESS_EUL_X_DATA_LSB 0x1A
+#define BNO055_REG_ADDRESS_EUL_X_DATA_MSB 0x1B
+#define BNO055_REG_ADDRESS_EUL_Y_DATA_LSB 0x1C
+#define BNO055_REG_ADDRESS_EUL_Y_DATA_MSB 0x1D
+#define BNO055_REG_ADDRESS_EUL_Z_DATA_LSB 0x13
+#define BNO055_REG_ADDRESS_EUL_Z_DATA_MSB 0x1F
+#define BNO055_REG_ADDRESS_TEMP_DATA 0x34
+#define BNO055_REG_ADDRESS_INT_STA 0x37
+#define BNO055_REG_ADDRESS_SYS_ERR 0x3A
+#define BNO055_REG_ADDRESS_UNIT_SEL 0x3B
+#define BNO055_REG_ADDRESS_OPR_MODE 0x3D // CNFG 0, ACCONLY 1, MAGONLY 2, GYROONLY 3, ACCMAG 4, ACCGYRO 5, MAGGYRO 6, AMG 7
+#define BNO055_REG_ADDRESS_PWR_MODE 0x3E
+#define BNO055_REG_ADDRESS_ACC_X_OFFSET_LSB 0x55
+#define BNO055_REG_ADDRESS_ACC_X_OFFSET_MSB 0x56
+#define BNO055_REG_ADDRESS_ACC_Y_OFFSET_LSB 0x57
+#define BNO055_REG_ADDRESS_ACC_Y_OFFSET_MSB 0x58
+#define BNO055_REG_ADDRESS_ACC_Z_OFFSET_LSB 0x59
+#define BNO055_REG_ADDRESS_ACC_Z_OFFSET_MSB 0x5A
+#define BNO055_REG_ADDRESS_MAG_X_OFFSET_LSB 0x5B
+#define BNO055_REG_ADDRESS_MAG_X_OFFSET_MSB 0x5C
+#define BNO055_REG_ADDRESS_MAG_Y_OFFSET_LSB 0x5D
+#define BNO055_REG_ADDRESS_MAG_Y_OFFSET_MSB 0x5E
+#define BNO055_REG_ADDRESS_MAG_Z_OFFSET_LSB 0x5F
+#define BNO055_REG_ADDRESS_MAG_Z_OFFSET_MSB 0x60
+#define BNO055_REG_ADDRESS_GYR_X_OFFSET_LSB 0x61
+#define BNO055_REG_ADDRESS_GYR_X_OFFSET_MSB 0x62
+#define BNO055_REG_ADDRESS_GYR_Y_OFFSET_LSB 0x63
+#define BNO055_REG_ADDRESS_GYR_Y_OFFSET_MSB 0x64
+#define BNO055_REG_ADDRESS_GYR_Z_OFFSET_LSB 0x65
+#define BNO055_REG_ADDRESS_GYR_Z_OFFSET_MSB 0x66
+
+#define BNO055_REG_ADDRESS_ACC_CONFIG 0x08
+#define BNO055_REG_ADDRESS_MAG_CONFIG 0x09
+#define BNO055_REG_ADDRESS_GYR_CONFIG_1 0x0A
+#define BNO055_REG_ADDRESS_GYR_CONFIG_2 0x0B
+#define BNO055_REG_ADDRESS_INT_MASK 0x0F
+#define BNO055_REG_ADDRESS_INT_EN 0x10
+#define BNO055_REG_ADDRESS_ACC_INT_AM_THRES 0x11
+#define BNO055_REG_ADDRESS_ACC_INT_SETTINGS 0x12
+#define BNO055_REG_ADDRESS_ACC_HG_DUR 0x13
+#define BNO055_REG_ADDRESS_ACC_HG_THRES 0x14
+#define BNO055_REG_ADDRESS_ACC NM_THRES 0x15
+#define BNO055_REG_ADDRESS_ACC_NM_SET 0x16
+
+/*********************************************
+ * CONFIG DATA
+ *********************************************/
+#define BNO055_CHIP_ID 0xA0
+#define BNO055_ACC_ID  0xFB
+#define BNO055_MAG_ID  0x32
+#define BNO055_GYR_ID  0x0F
+
+#define BNO055_DATA_OPR_MODE_OPR     0x00
+#define BNO055_DATA_OPR_MODE_ACC     0x01
+#define BNO055_DATA_OPR_MODE_MAG     0x02
+#define BNO055_DATA_OPR_MODE_GYRO    0x03
+#define BNO055_DATA_OPR_MODE_ACCMAG  0x04
+#define BNO055_DATA_OPR_MODE_ACCGYRO 0x05
+#define BNO055_DATA_OPR_MODE_MAGGYRO 0x06
+#define BNO055_DATA_OPR_MODE_AMG     0x07
+#define BNO055_DATA_OPR_MODE_IMU     0x08
+#define BNO055_DATA_OPR_MODE_CMP     0x09
+#define BNO055_DATA_OPR_MODE_M4G     0x0A
+#define BNO055_DATA_OPR_MODE_NFO     0x0B
+#define BNO055_DATA_OPR_MODE_NDOF    0x0C
+
+#define BNO055_DATA_PWR_MODE_NORMAL   0x00
+#define BNO055_DATA_PWR_MODE_LPWR     0x01
+#define BNO055_DATA_PWR_MODE_SUSPEND  0x02
+
+#define BNO055_DATA_ACC_RANGE_2G   0x00
+#define BNO055_DATA_ACC_RANGE_4G   0x01
+#define BNO055_DATA_ACC_RANGE_8G   0x02
+#define BNO055_DATA_ACC_RANGE_16G  0x03
+#define BNO055_DATA_ACC_BW_7p81Hz  0x00<<2
+#define BNO055_DATA_ACC_BW_15p63Hz 0x01<<2
+#define BNO055_DATA_ACC_BW_32p25Hz 0x02<<2
+#define BNO055_DATA_ACC_BW_62p5Hz  0x03<<2
+#define BNO055_DATA_ACC_BW_125Hz   0x04<<2
+#define BNO055_DATA_ACC_BW_250Hz   0x05<<2
+#define BNO055_DATA_ACC_BW_500Hz   0x06<<2
+#define BNO055_DATA_ACC_BW_1000Hz  0x07<<2
+#define BNO055_DATA_ACC_MODE_NORMAL      0x00<<5
+#define BNO055_DATA_ACC_MODE_SUSPEND     0x01<<5
+#define BNO055_DATA_ACC_MODE_LP1         0x02<<5
+#define BNO055_DATA_ACC_MODE_STANDBY     0x03<<5
+#define BNO055_DATA_ACC_MODE_LP2         0x04<<5
+#define BNO055_DATA_ACC_MODE_DEEPSUSPEND 0x05<<5
+
+#define BNO055_DATA_GYR_RANGE_2000DPS 0x00
+#define BNO055_DATA_GYR_RANGE_1000DPS 0x01
+#define BNO055_DATA_GYR_RANGE_500DPS 0x02
+#define BNO055_DATA_GYR_RANGE_250DPS 0x03
+#define BNO055_DATA_GYR_RANGE_125DPS 0x04
+#define BNO055_DATA_GYR_BW_532Hz 0x00<<3
+#define BNO055_DATA_GYR_BW_230Hz 0x01<<3
+#define BNO055_DATA_GYR_BW_116Hz 0x02<<3
+#define BNO055_DATA_GYR_BW_47Hz 0x03<<3
+#define BNO055_DATA_GYR_BW_23Hz 0x04<<3
+#define BNO055_DATA_GYR_BW_12Hz 0x05<<3
+#define BNO055_DATA_GYR_BW_64Hz 0x06<<3
+#define BNO055_DATA_GYR_BW_32Hz 0x07<<3
+
+#define BNO055_DATA_GYR_MODE_NORMAL      0x00
+#define BNO055_DATA_GYR_MODE_FAST_PU     0x01
+#define BNO055_DATA_GYR_MODE_DEEPSUSPEND 0x02
+#define BNO055_DATA_GYR_MODE_SUSPEND     0x03
+#define BNO055_DATA_GYR_MODE_POWERSAVE   0x04
+
+#define BNO055_DATA_MAG_BW_2Hz  0x00
+#define BNO055_DATA_MAG_BW_6Hz  0x01
+#define BNO055_DATA_MAG_BW_8Hz  0x02
+#define BNO055_DATA_MAG_BW_10Hz 0x03
+#define BNO055_DATA_MAG_BW_15Hz 0x04
+#define BNO055_DATA_MAG_BW_20Hz 0x05
+#define BNO055_DATA_MAG_BW_25Hz 0x06
+#define BNO055_DATA_MAG_BW_30Hz 0x07
+#define BNO055_DATA_MAG_MODE_LP           0x00<<3
+#define BNO055_DATA_MAG_MODE_REGULAR      0x01<<3
+#define BNO055_DATA_MAG_MODE_EREGULAR     0x02<<3
+#define BNO055_DATA_MAG_MODE_HIGHACCURACY 0x03<<3
+#define BNO055_DATA_MAG_PWRMODE_NORMAL   0x00<<5
+#define BNO055_DATA_MAG_PWRMODE_SLEEP   0x01<<5
+#define BNO055_DATA_MAG_PWRMODE_SUSPEND 0x02<<5
+#define BNO055_DATA_MAG_PWRMODE_FORCE   0x03<<5
+
+#define BNO055_DATA_UNIT_ACC_mG  0x01
+#define BNO055_DATA_UNIT_GYR_RPS 0x01<<1
+#define BNO055_DATA_UNIT_EUL_RAD 0x01<<2
+#define BNO055_DATA_UNIT_TMP_Fh  0x01<<4
+#define BNO055_DATA_UNIT_ORI_AND 0x01<<7
+
+#define BNO055_PAGE_ID_0 0x00
+#define BNO055_PAGE_ID_1 0x01
+
+typedef enum{
+	BNO055_OK,
+	BNO055_ERROR
+}BNO055_ReturnTypeDef_T;
+
+typedef struct{
+	uint8_t CHIP_ID;
+	uint8_t ACC_ID;
+	uint8_t MAG_ID;
+	uint8_t GYR_ID;
+}BNO055_ID_Data_T;
+
+typedef struct{
+	int16_t ACC_X;
+	int16_t ACC_Y;
+	int16_t ACC_Z;
+	int16_t GYR_X;
+	int16_t GYR_Y;
+	int16_t GYR_Z;
+	int16_t MAG_X;
+	int16_t MAG_Y;
+	int16_t MAG_Z;
+}BNO055_Data_T;
+
+typedef struct{
+	uint16_t ACC_1MpS2_LSB;
+	uint16_t MAG_1uT_LSB;
+	uint16_t GYR_1RPS_LSB;
+	uint8_t ACCRange_G;
+	uint16_t GYRRange_DPS;
+}BNO055_CalculateConstants_T;
+
+typedef struct{
+	uint8_t I2C_No;
+	uint8_t Chip_I2C_Address;
+	void* ResetPort;
+	uint16_t ResetPin;
+	uint8_t OprMode;
+	BNO055_Data_T ImuData;
+	BNO055_ID_Data_T IDs;
+	BNO055_CalculateConstants_T CalcConst;
+	uint8_t CalibState;
+	uint8_t UnitStat;
+	BNO055_Data_T CalibData;
+	uint8_t PageID;
+	uint16_t cnt2G;
+	uint16_t cnt4G;
+	uint8_t SysError;
+}BNO055_Sensor_T;
+
+extern BNO055_Sensor_T BNO055_Sensor_1;
+
+void BNO055_Init(BNO055_Sensor_T *handle, uint8_t I2C_No, uint8_t I2C_Adress, void* ResetGPIOPort, uint16_t ResetGPIOPin);
+void BNO055_Reset(BNO055_Sensor_T *handle);
+BNO055_ReturnTypeDef_T BNO055_Set_OperationMode(BNO055_Sensor_T *handle, uint8_t mode);
+BNO055_ReturnTypeDef_T BNO055_Get_OperationMode(BNO055_Sensor_T *handle);
+BNO055_ReturnTypeDef_T BNO055_Set_PowerMode(BNO055_Sensor_T *handle, uint8_t mode);
+BNO055_ReturnTypeDef_T BNO055_Get_ACC_Mode(BNO055_Sensor_T *handle);
+BNO055_ReturnTypeDef_T BNO055_Set_ACC_Mode(BNO055_Sensor_T *handle, uint8_t mode);
+BNO055_ReturnTypeDef_T BNO055_Set_MAG_Mode(BNO055_Sensor_T *handle, uint8_t mode);
+BNO055_ReturnTypeDef_T BNO055_Set_GYR_Mode_1(BNO055_Sensor_T *handle, uint8_t mode);
+BNO055_ReturnTypeDef_T BNO055_Set_GYR_Mode_2(BNO055_Sensor_T *handle, uint8_t mode);
+BNO055_ReturnTypeDef_T BNO055_Get_ChipID(BNO055_Sensor_T *handle);
+BNO055_ReturnTypeDef_T BNO055_Get_ACC_ID(BNO055_Sensor_T *handle);
+BNO055_ReturnTypeDef_T BNO055_Get_GYR_ID(BNO055_Sensor_T *handle);
+BNO055_ReturnTypeDef_T BNO055_Get_MAG_ID(BNO055_Sensor_T *handle);
+BNO055_ReturnTypeDef_T BNO055_Get_ACC_Data(BNO055_Sensor_T *handle);
+BNO055_ReturnTypeDef_T BNO055_Get_MAG_Data(BNO055_Sensor_T *handle);
+BNO055_ReturnTypeDef_T BNO055_Get_GYR_Data(BNO055_Sensor_T *handle);
+BNO055_ReturnTypeDef_T BNO055_GetCalibrationState(BNO055_Sensor_T *handle);
+BNO055_ReturnTypeDef_T BNO055_Set_ACCEL_Offset(BNO055_Sensor_T *handle, uint16_t AxisX_Offset, uint16_t AxisY_Offset, uint16_t AxisZ_Offset);
+BNO055_ReturnTypeDef_T BNO055_GetCalibrationData(BNO055_Sensor_T *handle);
+BNO055_ReturnTypeDef_T BNO055_Set_DataUnit(BNO055_Sensor_T *handle, uint8_t data);
+BNO055_ReturnTypeDef_T BNO055_Get_DataUnit(BNO055_Sensor_T *handle);
+BNO055_ReturnTypeDef_T BNO055_Get_PageID(BNO055_Sensor_T *handle);
+BNO055_ReturnTypeDef_T BNO055_Set_PageID(BNO055_Sensor_T *handle, uint8_t PageID);
+BNO055_ReturnTypeDef_T BNO055_Get_SysError(BNO055_Sensor_T *handle);
+BNO055_ReturnTypeDef_T BNO055_SendReceive(BNO055_Sensor_T *handle, uint8_t *txBuff, uint8_t txLenght, uint8_t *rxBuff, uint8_t rxLenght);
+
+#endif /* SENSORS_BNO055_H_ */

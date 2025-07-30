@@ -1,0 +1,4 @@
+../Core/Scaler/IMU.c:16:6:IMU_Init	1
+../Core/Scaler/IMU.c:29:6:IMU_Execute	1
+../Core/Scaler/IMU.c:92:6:IMU_PopulateData	1
+../Core/Scaler/IMU.c:107:18:IMU_GetSensorHandle	5

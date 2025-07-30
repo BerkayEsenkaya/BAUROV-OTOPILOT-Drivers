@@ -1,0 +1,3 @@
+../Core/Math/Filters.c:14:6:AVG_Filter	48	static
+../Core/Math/Filters.c:30:13:MED_Filter_SortArray	24	static
+../Core/Math/Filters.c:42:6:MED_Filter	16	static
