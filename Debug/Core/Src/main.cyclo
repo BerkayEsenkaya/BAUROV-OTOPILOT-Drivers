@@ -3,7 +3,8 @@
 ../Core/Src/main.c:233:13:MX_I2C2_Init	4
 ../Core/Src/main.c:281:13:MX_USART3_UART_Init	2
 ../Core/Src/main.c:316:13:MX_GPIO_Init	1
-../Core/Src/main.c:361:6:TaskMicroROS	2
-../Core/Src/main.c:385:6:TaskSensors	2
-../Core/Src/main.c:412:6:HAL_TIM_PeriodElapsedCallback	2
-../Core/Src/main.c:429:6:Error_Handler	1
+../Core/Src/main.c:351:6:HAL_Delay	1
+../Core/Src/main.c:364:6:TaskMicroROS	2
+../Core/Src/main.c:388:6:TaskSensors	2
+../Core/Src/main.c:415:6:HAL_TIM_PeriodElapsedCallback	2
+../Core/Src/main.c:432:6:Error_Handler	1

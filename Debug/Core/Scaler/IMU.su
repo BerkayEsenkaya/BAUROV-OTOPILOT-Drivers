@@ -1,4 +1,4 @@
 ../Core/Scaler/IMU.c:16:6:IMU_Init	32	static
 ../Core/Scaler/IMU.c:29:6:IMU_Execute	24	static
-../Core/Scaler/IMU.c:92:6:IMU_PopulateData	24	static
-../Core/Scaler/IMU.c:107:18:IMU_GetSensorHandle	16	static
+../Core/Scaler/IMU.c:93:6:IMU_PopulateData	24	static
+../Core/Scaler/IMU.c:108:18:IMU_GetSensorHandle	16	static

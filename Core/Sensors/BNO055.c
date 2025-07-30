@@ -27,36 +27,42 @@ void BNO055_Init(BNO055_Sensor_T *handle, uint8_t I2C_No, uint8_t I2C_Adress, vo
 
 	BNO055_Reset(handle);
 
-	BNO055_Set_OperationMode(handle, BNO055_DATA_OPR_MODE_OPR);
+	BNO055_Set_OperationMode(handle, BNO055_DATA_OPR_MODE_NDOF);
 	HAL_Delay(25);
 
 //    while(1){
 //    	BNO055_GetCalibrationState(handle);
-//    	BNO055_GetCalibrationData(handle);
-//    	if((handle->CalibState == 0xFF) || (handle->CalibState == 0xCF)){
+//    	if((handle->CalibState == 0xFF)){
+//    		HAL_Delay(5);
+//    		BNO055_GetCalibrationData(handle);
 //    		break;
 //    	}
 //    }
-	BNO055_Set_PowerMode(handle, BNO055_DATA_PWR_MODE_NORMAL);
 
-	BNO055_Set_DataUnit(handle, BNO055_DATA_UNIT_ACC_mG | BNO055_DATA_UNIT_GYR_RPS | BNO055_DATA_UNIT_ORI_AND);
+    BNO055_Set_OperationMode(handle, BNO055_DATA_OPR_MODE_OPR);
+    HAL_Delay(25);
+
+	BNO055_Set_PowerMode(handle, BNO055_DATA_PWR_MODE_NORMAL);
+//	BNO055_GetCalibrationData(handle);
+	BNO055_Set_DataUnit(handle, BNO055_DATA_UNIT_ACC_mG | BNO055_DATA_UNIT_ORI_AND);
 
 	BNO055_Get_DataUnit(handle);
 
-	BNO055_Set_ACC_Mode(handle, BNO055_DATA_ACC_RANGE_16G | BNO055_DATA_ACC_BW_7p81Hz |  BNO055_DATA_ACC_MODE_NORMAL);
+	BNO055_Set_ACC_Mode(handle, BNO055_DATA_ACC_RANGE_4G | BNO055_DATA_ACC_BW_62p5Hz |  BNO055_DATA_ACC_MODE_NORMAL);
 
 	BNO055_Get_ACC_Mode(handle);
 
-	BNO055_Set_MAG_Mode(handle, BNO055_DATA_MAG_BW_10Hz | BNO055_DATA_MAG_MODE_HIGHACCURACY | BNO055_DATA_MAG_PWRMODE_SUSPEND);
+	BNO055_Set_MAG_Mode(handle, BNO055_DATA_MAG_BW_10Hz | BNO055_DATA_MAG_MODE_HIGHACCURACY | BNO055_DATA_MAG_PWRMODE_NORMAL);
 
 	BNO055_Set_GYR_Mode_1(handle, BNO055_DATA_GYR_RANGE_500DPS | BNO055_DATA_GYR_BW_12Hz);
 
-	BNO055_Set_GYR_Mode_2(handle, BNO055_DATA_GYR_MODE_DEEPSUSPEND);
+	BNO055_Set_GYR_Mode_2(handle, BNO055_DATA_GYR_MODE_NORMAL);
 
 
-	BNO055_Set_OperationMode(handle, BNO055_DATA_OPR_MODE_ACC);
+	BNO055_Set_OperationMode(handle, BNO055_DATA_OPR_MODE_AMG);
 
 	HAL_Delay(100);
+
 	BNO055_Get_ChipID(handle);
 	BNO055_Get_ACC_ID(handle);
 	BNO055_Get_GYR_ID(handle);

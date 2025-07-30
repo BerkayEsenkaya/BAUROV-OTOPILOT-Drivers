@@ -2,26 +2,26 @@
  * Filters.h
  *
  *  Created on: Jul 25, 2025
- *      Author: ggize
+ *      Author: Berkay Esenkaya
  */
 
 #ifndef MATH_FILTERS_H_
 #define MATH_FILTERS_H_
 
-#define AVG_FilterBufferSize 5
-#define MED_FilterBufferSize 3 //tek sayı olmalı
+#define AVG_FilterBufferSize 10
+#define MED_FilterBufferSize 7 //tek sayı olmalı
 
 typedef struct{
-	int32_t AVG_FilterBuffer[AVG_FilterBufferSize];
-	int32_t AVG_FilteredData;
-	int32_t AVG_FilteredPreData;
+	int16_t AVG_FilterBuffer[AVG_FilterBufferSize];
+	int16_t AVG_FilteredData;
+	int16_t AVG_FilteredPreData;
 	uint16_t AVG_FilterCounter;
 }AVG_FilterTypeDef_T;
 
 typedef struct{
-	int32_t MED_FilterBuffer[MED_FilterBufferSize];
-	int32_t MED_FilteredData;
-	int32_t MED_FilteredPreData;
+	int16_t MED_FilterBuffer[MED_FilterBufferSize];
+	int16_t MED_FilteredData;
+	int16_t MED_FilteredPreData;
 	uint16_t MED_FilterCounter;
 }MED_FilterTypeDef_T;
 
