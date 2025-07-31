@@ -1,6 +1,6 @@
 ################################################################################
 # Automatically-generated file. Do not edit!
-# Toolchain: GNU Tools for STM32 (13.3.rel1)
+# Toolchain: GNU Tools for STM32 (12.3.rel1)
 ################################################################################
 
 -include ../makefile.init
@@ -43,23 +43,23 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := BAUROV-OTOPILOT-Drivers1
+BUILD_ARTIFACT_NAME := BAUROV-OTOPILOT-NUCF7
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-BAUROV-OTOPILOT-Drivers1.elf \
+BAUROV-OTOPILOT-NUCF7.elf \
 
 MAP_FILES += \
-BAUROV-OTOPILOT-Drivers1.map \
+BAUROV-OTOPILOT-NUCF7.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-BAUROV-OTOPILOT-Drivers1.list \
+BAUROV-OTOPILOT-NUCF7.list \
 
 
 # All Target
@@ -67,11 +67,11 @@ all:
 	+@$(MAKE) --no-print-directory pre-build && $(MAKE) --no-print-directory main-build
 
 # Main-build Target
-main-build: BAUROV-OTOPILOT-Drivers1.elf secondary-outputs
+main-build: BAUROV-OTOPILOT-NUCF7.elf secondary-outputs
 
 # Tool invocations
-BAUROV-OTOPILOT-Drivers1.elf BAUROV-OTOPILOT-Drivers1.map: $(OBJS) $(USER_OBJS) /home/berkay/STM32CubeIDE/workspace_1.19.0/BAUROV-OTOPILOT-Drivers1/STM32F767ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "BAUROV-OTOPILOT-Drivers1.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"/home/berkay/STM32CubeIDE/workspace_1.19.0/BAUROV-OTOPILOT-Drivers1/STM32F767ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="BAUROV-OTOPILOT-Drivers1.map" -Wl,--gc-sections -static -L../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+BAUROV-OTOPILOT-NUCF7.elf BAUROV-OTOPILOT-NUCF7.map: $(OBJS) $(USER_OBJS) C:\Users\ggize\STM32CubeIDE\workspace_1.17.0\BAUROV-OTOPILOT-NUCF7\STM32F767ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "BAUROV-OTOPILOT-NUCF7.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\ggize\STM32CubeIDE\workspace_1.17.0\BAUROV-OTOPILOT-NUCF7\STM32F767ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="BAUROV-OTOPILOT-NUCF7.map" -Wl,--gc-sections -static -L../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -80,18 +80,18 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-BAUROV-OTOPILOT-Drivers1.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "BAUROV-OTOPILOT-Drivers1.list"
+BAUROV-OTOPILOT-NUCF7.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "BAUROV-OTOPILOT-NUCF7.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) BAUROV-OTOPILOT-Drivers1.elf BAUROV-OTOPILOT-Drivers1.list BAUROV-OTOPILOT-Drivers1.map default.size.stdout
+	-$(RM) BAUROV-OTOPILOT-NUCF7.elf BAUROV-OTOPILOT-NUCF7.list BAUROV-OTOPILOT-NUCF7.map default.size.stdout
 	-@echo ' '
 
 pre-build:
-	docker pull microros/micro_ros_static_library_builder:humble && docker run --rm -v /home/berkay/STM32CubeIDE/workspace_1.19.0/BAUROV-OTOPILOT-Drivers1:/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:humble
+	docker pull microros/micro_ros_static_library_builder:humble && docker run --rm -v C:\Users\ggize\STM32CubeIDE\workspace_1.17.0\BAUROV-OTOPILOT-NUCF7:/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:humble
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
