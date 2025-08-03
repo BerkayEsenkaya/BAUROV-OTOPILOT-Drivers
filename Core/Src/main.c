@@ -540,7 +540,7 @@ void TaskSensors(void *argument)
   for(;;)
   {
 	i++;
-	if(i>=25){
+	if(i>=20){
 		HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 		i=0;
 	}

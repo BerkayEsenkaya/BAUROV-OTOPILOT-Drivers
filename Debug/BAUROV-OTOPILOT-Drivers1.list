@@ -4951,9 +4951,9 @@ void TaskSensors(void *argument)
  8002294:	68fb      	ldr	r3, [r7, #12]
  8002296:	3301      	adds	r3, #1
  8002298:	60fb      	str	r3, [r7, #12]
-	if(i>=25){
+	if(i>=20){
  800229a:	68fb      	ldr	r3, [r7, #12]
- 800229c:	2b18      	cmp	r3, #24
+ 800229c:	2b13      	cmp	r3, #19
  800229e:	dd05      	ble.n	80022ac <TaskSensors+0x38>
 		HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
  80022a0:	2180      	movs	r1, #128	@ 0x80
