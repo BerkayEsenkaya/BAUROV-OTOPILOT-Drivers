@@ -59,7 +59,7 @@ BAR100_ReturnTypeDef_T BAR100_StartPressureConversion(BAR100_Sensor_T *handle){
  */
 BAR100_ReturnTypeDef_T BAR100_ReadPressure(BAR100_Sensor_T *handle){
 	uint8_t RxBuff[5], state;
-	if(!BAR30_Read(handle, 0xAC, RxBuff)){
+	if(!BAR100_Read(handle, 0xAC, RxBuff)){
 		handle->Pressure_RawData = RxBuff[2] | (RxBuff[1]<<8);
 	    handle->Temperature_RawData = RxBuff[4] | (RxBuff[3]<<8);
 	    state = RxBuff[0];
@@ -68,18 +68,6 @@ BAR100_ReturnTypeDef_T BAR100_ReadPressure(BAR100_Sensor_T *handle){
 	else
 		return BAR100_ERROR;
 }
-
-//BAR30_ReturnTypeDef_T BAR30_Get_CustIds(BAR30_Sensor_T *handle){
-//	uint8_t RxBuff[1];
-//	if(!BAR30_Read(handle, BAR30_MTP_ADDRESS_CUST_ID_0, RxBuff)){
-//		handle->CustIDs_1 = RxBuff[1] | RxBuff[0]<<8;
-//	}
-//	if(!BAR30_Read(handle, BAR30_MTP_ADDRESS_CUST_ID_1, RxBuff)){
-//			handle->CustIDs_2 = RxBuff[1] | RxBuff[0]<<8;
-//			return BAR30_OK;
-//	}
-//	return BAR30_ERROR;
-//}
 
 BAR100_ReturnTypeDef_T BAR100_Get_ScalingValues(BAR100_Sensor_T *handle){
 	uint8_t RxBuff[3];

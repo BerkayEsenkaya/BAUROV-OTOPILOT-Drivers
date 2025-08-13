@@ -5,13 +5,16 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../Core/Scaler/IMU.c 
+../Core/Scaler/IMU.c \
+../Core/Scaler/PressureSensor.c 
 
 OBJS += \
-./Core/Scaler/IMU.o 
+./Core/Scaler/IMU.o \
+./Core/Scaler/PressureSensor.o 
 
 C_DEPS += \
-./Core/Scaler/IMU.d 
+./Core/Scaler/IMU.d \
+./Core/Scaler/PressureSensor.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -21,7 +24,7 @@ Core/Scaler/%.o Core/Scaler/%.su Core/Scaler/%.cyclo: ../Core/Scaler/%.c Core/Sc
 clean: clean-Core-2f-Scaler
 
 clean-Core-2f-Scaler:
-	-$(RM) ./Core/Scaler/IMU.cyclo ./Core/Scaler/IMU.d ./Core/Scaler/IMU.o ./Core/Scaler/IMU.su
+	-$(RM) ./Core/Scaler/IMU.cyclo ./Core/Scaler/IMU.d ./Core/Scaler/IMU.o ./Core/Scaler/IMU.su ./Core/Scaler/PressureSensor.cyclo ./Core/Scaler/PressureSensor.d ./Core/Scaler/PressureSensor.o ./Core/Scaler/PressureSensor.su
 
 .PHONY: clean-Core-2f-Scaler
 

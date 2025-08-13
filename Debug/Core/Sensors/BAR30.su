@@ -1,0 +1,13 @@
+../Core/Sensors/BAR30.c:22:23:BAR30_Init	24	static
+../Core/Sensors/BAR30.c:42:6:BAR30_Execute	24	static
+../Core/Sensors/BAR30.c:67:23:BAR30_Reset	16	static
+../Core/Sensors/BAR30.c:74:23:BAR30_StartPressureConversionWithOSR	16	static
+../Core/Sensors/BAR30.c:81:23:BAR30_StartTempConversionWithOSR	16	static
+../Core/Sensors/BAR30.c:88:23:BAR30_ReadPressure	24	static
+../Core/Sensors/BAR30.c:102:23:BAR30_ReadTemp	24	static
+../Core/Sensors/BAR30.c:116:23:BAR30_Get_PromValues	24	static
+../Core/Sensors/BAR30.c:137:17:BAR30_GetHandle	16	static
+../Core/Sensors/BAR30.c:149:9:BAR30_CalculateCRC_4	32	static
+../Core/Sensors/BAR30.c:178:6:BAR30_ConvertPascal	40	static
+../Core/Sensors/BAR30.c:188:6:BAR30_ConvertCentigrade	16	static
+../Core/Sensors/BAR30.c:197:23:BAR30_SendReceive	48	static

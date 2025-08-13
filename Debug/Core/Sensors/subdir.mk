@@ -7,20 +7,29 @@
 C_SRCS += \
 ../Core/Sensors/BAR100.c \
 ../Core/Sensors/BAR100_CommPorter.c \
+../Core/Sensors/BAR30.c \
+../Core/Sensors/BAR30_CommPorter.c \
 ../Core/Sensors/BNO055.c \
-../Core/Sensors/BNO055_CommPorter.c 
+../Core/Sensors/BNO055_CommPorter.c \
+../Core/Sensors/RC522.c 
 
 OBJS += \
 ./Core/Sensors/BAR100.o \
 ./Core/Sensors/BAR100_CommPorter.o \
+./Core/Sensors/BAR30.o \
+./Core/Sensors/BAR30_CommPorter.o \
 ./Core/Sensors/BNO055.o \
-./Core/Sensors/BNO055_CommPorter.o 
+./Core/Sensors/BNO055_CommPorter.o \
+./Core/Sensors/RC522.o 
 
 C_DEPS += \
 ./Core/Sensors/BAR100.d \
 ./Core/Sensors/BAR100_CommPorter.d \
+./Core/Sensors/BAR30.d \
+./Core/Sensors/BAR30_CommPorter.d \
 ./Core/Sensors/BNO055.d \
-./Core/Sensors/BNO055_CommPorter.d 
+./Core/Sensors/BNO055_CommPorter.d \
+./Core/Sensors/RC522.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -30,7 +39,7 @@ Core/Sensors/%.o Core/Sensors/%.su Core/Sensors/%.cyclo: ../Core/Sensors/%.c Cor
 clean: clean-Core-2f-Sensors
 
 clean-Core-2f-Sensors:
-	-$(RM) ./Core/Sensors/BAR100.cyclo ./Core/Sensors/BAR100.d ./Core/Sensors/BAR100.o ./Core/Sensors/BAR100.su ./Core/Sensors/BAR100_CommPorter.cyclo ./Core/Sensors/BAR100_CommPorter.d ./Core/Sensors/BAR100_CommPorter.o ./Core/Sensors/BAR100_CommPorter.su ./Core/Sensors/BNO055.cyclo ./Core/Sensors/BNO055.d ./Core/Sensors/BNO055.o ./Core/Sensors/BNO055.su ./Core/Sensors/BNO055_CommPorter.cyclo ./Core/Sensors/BNO055_CommPorter.d ./Core/Sensors/BNO055_CommPorter.o ./Core/Sensors/BNO055_CommPorter.su
+	-$(RM) ./Core/Sensors/BAR100.cyclo ./Core/Sensors/BAR100.d ./Core/Sensors/BAR100.o ./Core/Sensors/BAR100.su ./Core/Sensors/BAR100_CommPorter.cyclo ./Core/Sensors/BAR100_CommPorter.d ./Core/Sensors/BAR100_CommPorter.o ./Core/Sensors/BAR100_CommPorter.su ./Core/Sensors/BAR30.cyclo ./Core/Sensors/BAR30.d ./Core/Sensors/BAR30.o ./Core/Sensors/BAR30.su ./Core/Sensors/BAR30_CommPorter.cyclo ./Core/Sensors/BAR30_CommPorter.d ./Core/Sensors/BAR30_CommPorter.o ./Core/Sensors/BAR30_CommPorter.su ./Core/Sensors/BNO055.cyclo ./Core/Sensors/BNO055.d ./Core/Sensors/BNO055.o ./Core/Sensors/BNO055.su ./Core/Sensors/BNO055_CommPorter.cyclo ./Core/Sensors/BNO055_CommPorter.d ./Core/Sensors/BNO055_CommPorter.o ./Core/Sensors/BNO055_CommPorter.su ./Core/Sensors/RC522.cyclo ./Core/Sensors/RC522.d ./Core/Sensors/RC522.o ./Core/Sensors/RC522.su
 
 .PHONY: clean-Core-2f-Sensors
 
