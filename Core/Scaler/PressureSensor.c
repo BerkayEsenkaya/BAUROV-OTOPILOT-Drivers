@@ -9,6 +9,7 @@
 #include "PressureSensor.h"
 #include "BAR30.h"
 #include "Filters.h"
+#include "main.h"
 
 PressureSensor_TypeDef_T PressureSensor_1;
 
@@ -19,9 +20,11 @@ void PressureSensor_Init(PressureSensor_TypeDef_T *handle, uint8_t PressureSenso
 void PressureSensor_Execute(PressureSensor_TypeDef_T *handle, uint8_t PressureSensorNo){
 
 	BAR30_Execute(PressureSensorNo);
+
 	PressureSensor_PopulateAllData(handle);
 
 	MED_Filter_u32(&MED_PressureSensor_1, handle->PressureData);
+
 	AVG_Filter_u32(&AVG_PressureSensor_1, MED_PressureSensor_1.MED_FilteredData);
 
 	handle->FilteredPressureDataPascal = AVG_PressureSensor_1.AVG_FilteredData;

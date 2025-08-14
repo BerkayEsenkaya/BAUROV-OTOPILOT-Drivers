@@ -12,7 +12,7 @@
 #include "BAR30_CommPorter.h"
 
 BAR30_Sensor_T BAR30_1 ,BAR30_2, BAR30_3;
-
+uint32_t tickpre, tickpost, bar30startpressure_tick, readpressure_start_temp_tick, readttemp_and_convert_tick;
 /**********************************************************
  * GLOBAL FUNCTIONS
  *********************************************************/
@@ -22,6 +22,7 @@ BAR30_Sensor_T BAR30_1 ,BAR30_2, BAR30_3;
 BAR30_ReturnTypeDef_T BAR30_Init(uint8_t BAR30_No, uint8_t i2cNo, uint8_t devI2CAddress){
 	BAR30_ReturnTypeDef_T res;
 	BAR30_Sensor_T *bar;
+	uint8_t i=0;
 
 	bar = BAR30_GetHandle(BAR30_No);
 
@@ -31,7 +32,10 @@ BAR30_ReturnTypeDef_T BAR30_Init(uint8_t BAR30_No, uint8_t i2cNo, uint8_t devI2C
 	res = BAR30_Reset(bar);
 	HAL_Delay(25);
 
-	while (BAR30_Get_PromValues(bar) == BAR30_ERROR);
+	while (BAR30_Get_PromValues(bar) == BAR30_ERROR){
+		if(i++ > 10)
+			break;
+	}
 
 	return res;
 }
@@ -41,21 +45,27 @@ BAR30_ReturnTypeDef_T BAR30_Init(uint8_t BAR30_No, uint8_t i2cNo, uint8_t devI2C
  */
 void BAR30_Execute(uint8_t BAR30_No){
 	BAR30_Sensor_T *bar;
+    static int8_t i=0;
 
 	bar = BAR30_GetHandle(BAR30_No);
+	if(i==0)
+		BAR30_StartPressureConversionWithOSR(bar, BAR30_COMMANDS_D1_OSR_2048);
 
-	BAR30_StartPressureConversionWithOSR(bar, BAR30_COMMANDS_D1_OSR_2048);
-	HAL_Delay(BAR30_TIMEOUT_MS_OSR_2048);
+	if(i==1){
+		BAR30_ReadPressure(bar);
+		BAR30_StartTempConversionWithOSR(bar, BAR30_COMMANDS_D2_OSR_1024);
+	}
 
-	BAR30_ReadPressure(bar);
+	if(i==2){
+		BAR30_ReadTemp(bar);
+		BAR30_ConvertCentigrade(bar);
+		BAR30_ConvertPascal(bar);
+		i= -1;
+	}
 
-	BAR30_StartTempConversionWithOSR(bar, BAR30_COMMANDS_D2_OSR_1024);
-	HAL_Delay(BAR30_TIMEOUT_MS_OSR_1024);
+	i++;
 
-	BAR30_ReadTemp(bar);
 
-	BAR30_ConvertCentigrade(bar);
-	BAR30_ConvertPascal(bar);
 }
 
 /**********************************************************
@@ -198,6 +208,5 @@ BAR30_ReturnTypeDef_T BAR30_SendReceive(BAR30_Sensor_T *handle, uint8_t Command,
 	uint8_t txBuff[1], txLenght;
 	txBuff[0] = Command;
 	txLenght = 1;
-	HAL_Delay(1);
 	return BAR30_CommPorter_SendReceive(handle->devParam.I2C_No, handle->devParam.DevAdress, txBuff, txLenght, rxBuff, rxLenght);
 }

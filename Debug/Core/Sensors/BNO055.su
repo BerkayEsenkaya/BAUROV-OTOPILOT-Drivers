@@ -23,4 +23,4 @@
 ../Core/Sensors/BNO055.c:570:24:BNO055_Get_PageID	32	static
 ../Core/Sensors/BNO055.c:583:24:BNO055_Set_PageID	32	static
 ../Core/Sensors/BNO055.c:599:24:BNO055_Get_SysError	32	static
-../Core/Sensors/BNO055.c:612:24:BNO055_SendReceive	40	static
+../Core/Sensors/BNO055.c:612:24:BNO055_SendReceive	32	static

@@ -23,7 +23,7 @@ void IMU_Init(IMU_TypeDef_T *ImuHandle, uint8_t ImuSensorNo, uint8_t IMU_I2CNO, 
 	ImuHandle->CalcConst.GYR_1RPS_LSB  = imuSensor->CalcConst.GYR_1RPS_LSB;
 	ImuHandle->CalcConst.MAG_1uT_LSB   = imuSensor->CalcConst.MAG_1uT_LSB;
 
-	HAL_Delay(250);
+	HAL_Delay(25);
 }
 
 void IMU_Execute(IMU_TypeDef_T *ImuHandle, uint8_t ImuSensorNo){

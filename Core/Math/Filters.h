@@ -8,8 +8,8 @@
 #ifndef MATH_FILTERS_H_
 #define MATH_FILTERS_H_
 
-#define AVG_FilterBufferSize 10
-#define MED_FilterBufferSize 7 //tek sayı olmalı
+#define AVG_FilterBufferSize 4
+#define MED_FilterBufferSize 5 //tek sayı olmalı
 
 typedef struct{
 	int16_t AVG_FilterBuffer[AVG_FilterBufferSize];

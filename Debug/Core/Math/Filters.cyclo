@@ -1,6 +1,6 @@
-../Core/Math/Filters.c:17:6:AVG_Filter_s16	3
+../Core/Math/Filters.c:17:6:AVG_Filter_s16	4
 ../Core/Math/Filters.c:33:13:MED_Filter_SortArray_s16	4
 ../Core/Math/Filters.c:45:6:MED_Filter_s16	2
-../Core/Math/Filters.c:58:6:AVG_Filter_u32	3
+../Core/Math/Filters.c:58:6:AVG_Filter_u32	4
 ../Core/Math/Filters.c:74:13:MED_Filter_SortArray_u32	4
 ../Core/Math/Filters.c:86:6:MED_Filter_u32	2

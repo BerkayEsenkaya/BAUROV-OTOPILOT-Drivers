@@ -35,12 +35,12 @@ I2C_ReturnTypeDef_T I2C_ReadWrite_Poll(uint8_t I2CNo, uint8_t DevAddress, uint8_
 	rxAddr = ((DevAddress<<1) | 0x01);
 	i2c = I2C_GetModule(I2CNo);
 	if(rxLenght == 0){
-		res = HAL_I2C_Master_Transmit(i2c->handle , txAddr, txBuff, txLenght,1000);
+		res = HAL_I2C_Master_Transmit(i2c->handle , txAddr, txBuff, txLenght,100);
 		return res == I2C_ERROR;
 	}else{
-		HAL_I2C_Master_Transmit(i2c->handle , txAddr, txBuff, txLenght,1000);
+		HAL_I2C_Master_Transmit(i2c->handle , txAddr, txBuff, txLenght,100);
 		HAL_Delay(1);
-		res = HAL_I2C_Master_Receive(i2c->handle, rxAddr, rxBuff, rxLenght,1000);
+		res = HAL_I2C_Master_Receive(i2c->handle, rxAddr, rxBuff, rxLenght,100);
 		return res == I2C_ERROR;
 	}
 }

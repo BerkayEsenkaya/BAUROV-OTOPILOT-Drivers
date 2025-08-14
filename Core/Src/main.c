@@ -308,7 +308,7 @@ static void MX_I2C2_Init(void)
 
   /* USER CODE END I2C2_Init 1 */
   hi2c2.Instance = I2C2;
-  hi2c2.Init.Timing = 0x20000209;
+  hi2c2.Init.Timing = 0x20303E5D;
   hi2c2.Init.OwnAddress1 = 0;
   hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -334,10 +334,6 @@ static void MX_I2C2_Init(void)
   {
     Error_Handler();
   }
-
-  /** I2C Enable Fast Mode Plus
-  */
-  HAL_I2CEx_EnableFastModePlus(I2C_FASTMODEPLUS_I2C2);
   /* USER CODE BEGIN I2C2_Init 2 */
   I2C_Init(&hi2c2, I2CNO_2);
   /* USER CODE END I2C2_Init 2 */
@@ -360,7 +356,7 @@ static void MX_I2C3_Init(void)
 
   /* USER CODE END I2C3_Init 1 */
   hi2c3.Instance = I2C3;
-  hi2c3.Init.Timing = 0x20000209;
+  hi2c3.Init.Timing = 0x20303E5D;
   hi2c3.Init.OwnAddress1 = 0;
   hi2c3.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c3.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -386,10 +382,6 @@ static void MX_I2C3_Init(void)
   {
     Error_Handler();
   }
-
-  /** I2C Enable Fast Mode Plus
-  */
-  HAL_I2CEx_EnableFastModePlus(I2C_FASTMODEPLUS_I2C3);
   /* USER CODE BEGIN I2C3_Init 2 */
   I2C_Init(&hi2c3, I2CNO_3);
   /* USER CODE END I2C3_Init 2 */
@@ -725,7 +717,7 @@ void TaskMicroROS(void *argument)
 
 	    osMutexRelease(microrosMsgMutexHandle);
 
-	    osDelay(10);
+	    osDelay(100);
 	  }
   /* USER CODE END 5 */
 }
@@ -741,20 +733,16 @@ void TaskSensors(void *argument)
 {
   /* USER CODE BEGIN TaskSensors */
 
-	IMU_Init(&IMU_1, 1, I2CNO_3, BNO055_I2C_ADRESS, 0, 0);
-	PressureSensor_Init(&PressureSensor_1, 1, I2CNO_2, 0x40);
+	IMU_Init(&IMU_1, 1, I2CNO_2, BNO055_I2C_ADRESS, 0, 0);
+	PressureSensor_Init(&PressureSensor_1, 1, I2CNO_3, 0x40);
 	osDelay(100);
 
   /* Infinite loop */
   for(;;)
   {
-	for(int j = 0; j<180; j+=10){
-		Servo_SetAngle(j);
-		osDelay(10);
-	}
 
 	IMU_Execute(&IMU_1, 1);
-	PressureSensor_Execute(&PressureSensor_1, 1);
+//	PressureSensor_Execute(&PressureSensor_1, 1);
 
 	osMutexAcquire(microrosMsgMutexHandle, osWaitForever);
 
@@ -766,7 +754,7 @@ void TaskSensors(void *argument)
 
 	osMutexRelease(microrosMsgMutexHandle);
 
-	osDelay(20);
+	osDelay(10);
   }
   /* USER CODE END TaskSensors */
 }

@@ -610,11 +610,5 @@ BNO055_ReturnTypeDef_T BNO055_Get_SysError(BNO055_Sensor_T *handle){
  *  here.
  */
 BNO055_ReturnTypeDef_T BNO055_SendReceive(BNO055_Sensor_T *handle, uint8_t *txBuff, uint8_t txLenght, uint8_t *rxBuff, uint8_t rxLenght){
-	BNO055_ReturnTypeDef_T res = BNO055_CommPorter_SendReceive(handle->I2C_No, handle->Chip_I2C_Address, txBuff, txLenght, rxBuff, rxLenght);
-	HAL_Delay(1);
-	if(res){
-		return res;
-	}else{
-		return res;
-	}
+	return BNO055_CommPorter_SendReceive(handle->I2C_No, handle->Chip_I2C_Address, txBuff, txLenght, rxBuff, rxLenght);
 }
