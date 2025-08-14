@@ -7,7 +7,7 @@ Archive member included to satisfy reference by file (symbol)
 ../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/libmicroros.a(librclc-node.c.obj)
                               ./Core/Src/main.o (rclc_node_init_default)
 ../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/libmicroros.a(librclc-publisher.c.obj)
-                              ./Core/Src/main.o (rclc_publisher_init_default)
+                              ./Core/Src/main.o (rclc_publisher_init_best_effort)
 ../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/libmicroros.a(librcutils-allocator.c.obj)
                               ./Core/Src/main.o (rcutils_get_zero_initialized_allocator)
 ../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/libmicroros.a(librcutils-error_handling.c.obj)
@@ -6616,11 +6616,11 @@ Discarded input sections
  .text          0x00000000        0x0 ../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/libmicroros.a(librclc-publisher.c.obj)
  .data          0x00000000        0x0 ../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/libmicroros.a(librclc-publisher.c.obj)
  .bss           0x00000000        0x0 ../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/libmicroros.a(librclc-publisher.c.obj)
- .text.rclc_publisher_init_best_effort
+ .text.rclc_publisher_init_default
                 0x00000000       0x74 ../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/libmicroros.a(librclc-publisher.c.obj)
  .text.rclc_publisher_init
                 0x00000000       0x80 ../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/libmicroros.a(librclc-publisher.c.obj)
- .rodata.rmw_qos_profile_sensor_data
+ .rodata.rmw_qos_profile_default
                 0x00000000       0x50 ../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/libmicroros.a(librclc-publisher.c.obj)
  .text          0x00000000        0x0 ../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/libmicroros.a(librcutils-allocator.c.obj)
  .data          0x00000000        0x0 ../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/libmicroros.a(librcutils-allocator.c.obj)
@@ -9469,9 +9469,9 @@ LOAD /opt/st/stm32cubeide_1.19.0/plugins/com.st.stm32cube.ide.mcu.externaltools.
  .text.rclc_node_init_default
                 0x0800c6a4       0x84 ../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/libmicroros.a(librclc-node.c.obj)
                 0x0800c6a4                rclc_node_init_default
- .text.rclc_publisher_init_default
+ .text.rclc_publisher_init_best_effort
                 0x0800c728       0x74 ../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/libmicroros.a(librclc-publisher.c.obj)
-                0x0800c728                rclc_publisher_init_default
+                0x0800c728                rclc_publisher_init_best_effort
  .text.__default_zero_allocate
                 0x0800c79c        0x4 ../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/libmicroros.a(librcutils-allocator.c.obj)
  .text.__default_reallocate
@@ -10928,7 +10928,7 @@ LOAD /opt/st/stm32cubeide_1.19.0/plugins/com.st.stm32cube.ide.mcu.externaltools.
                 0x08017b6c        0x4 ../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/libmicroros.a(librcl-publisher.c.obj)
  .rodata.rmw_qos_profile_default
                 0x08017b70       0x50 ../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/libmicroros.a(librcl-publisher.c.obj)
- .rodata.rmw_qos_profile_default
+ .rodata.rmw_qos_profile_sensor_data
                 0x08017bc0       0x50 ../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/libmicroros.a(librclc-publisher.c.obj)
  .rodata.zero_allocator.0
                 0x08017c10       0x14 ../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/libmicroros.a(librcutils-allocator.c.obj)
@@ -12579,49 +12579,49 @@ LOAD /opt/st/stm32cubeide_1.19.0/plugins/com.st.stm32cube.ide.mcu.externaltools.
  .debug_line    0x00026ada      0x748 ./Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/port.o
  .debug_line    0x00027222      0x880 ./Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.o
 
-.debug_str      0x00000000   0x117478
- .debug_str     0x00000000   0x117478 ./Core/Math/Filters.o
+.debug_str      0x00000000   0x11747c
+ .debug_str     0x00000000   0x11747c ./Core/Math/Filters.o
                                0x76a5 (size before relaxing)
- .debug_str     0x00117478    0xf61d1 ./Core/PeripheralPorts/I2C.o
- .debug_str     0x00117478    0xf742d ./Core/Scaler/IMU.o
- .debug_str     0x00117478    0xf6198 ./Core/Scaler/PressureSensor.o
- .debug_str     0x00117478    0xf9b0f ./Core/Sensors/BAR30.o
- .debug_str     0x00117478     0x3ed4 ./Core/Sensors/BAR30_CommPorter.o
- .debug_str     0x00117478    0xf7370 ./Core/Sensors/BNO055.o
- .debug_str     0x00117478     0x3eb9 ./Core/Sensors/BNO055_CommPorter.o
- .debug_str     0x00117478     0xb3ea ./Core/Src/custom_memory_manager.o
- .debug_str     0x00117478   0x10985a ./Core/Src/main.o
- .debug_str     0x00117478     0xbd33 ./Core/Src/microros_allocators.o
- .debug_str     0x00117478     0xd6db ./Core/Src/microros_time.o
- .debug_str     0x00117478    0xf72bb ./Core/Src/stm32f7xx_hal_msp.o
- .debug_str     0x00117478    0xf674c ./Core/Src/stm32f7xx_hal_timebase_tim.o
- .debug_str     0x00117478    0xf655f ./Core/Src/stm32f7xx_it.o
- .debug_str     0x00117478     0x9a37 ./Core/Src/syscalls.o
- .debug_str     0x00117478     0x77d5 ./Core/Src/sysmem.o
- .debug_str     0x00117478    0xf5b9b ./Core/Src/system_stm32f7xx.o
- .debug_str     0x00117478   0x1003fb ./Core/Src/microros_transports/dma_transport.o
- .debug_str     0x00117478       0x8e ./Core/Startup/startup_stm32f767zitx.o
- .debug_str     0x00117478    0xf65db ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal.o
- .debug_str     0x00117478    0xf65bd ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_cortex.o
- .debug_str     0x00117478    0xf5eda ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_dma.o
- .debug_str     0x00117478    0xf5c59 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_gpio.o
- .debug_str     0x00117478    0xf6dae ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c.o
- .debug_str     0x00117478    0xf602d ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c_ex.o
- .debug_str     0x00117478    0xf5e3c ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pwr.o
- .debug_str     0x00117478    0xf5e0a ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pwr_ex.o
- .debug_str     0x00117478    0xf5f16 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc.o
- .debug_str     0x00117478    0xf5e79 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc_ex.o
- .debug_str     0x00117478    0xf63d5 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_spi.o
- .debug_str     0x00117478    0xf6ebe ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim.o
- .debug_str     0x00117478    0xf67c4 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim_ex.o
- .debug_str     0x00117478    0xf6864 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart.o
- .debug_str     0x00117478     0xed50 ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o
- .debug_str     0x00117478     0xaaf9 ./Middlewares/Third_Party/FreeRTOS/Source/list.o
- .debug_str     0x00117478     0xc61f ./Middlewares/Third_Party/FreeRTOS/Source/queue.o
- .debug_str     0x00117478     0xd0b1 ./Middlewares/Third_Party/FreeRTOS/Source/tasks.o
- .debug_str     0x00117478     0xcb4d ./Middlewares/Third_Party/FreeRTOS/Source/timers.o
- .debug_str     0x00117478     0x861a ./Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/port.o
- .debug_str     0x00117478     0xb316 ./Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.o
+ .debug_str     0x0011747c    0xf61d1 ./Core/PeripheralPorts/I2C.o
+ .debug_str     0x0011747c    0xf742d ./Core/Scaler/IMU.o
+ .debug_str     0x0011747c    0xf6198 ./Core/Scaler/PressureSensor.o
+ .debug_str     0x0011747c    0xf9b0f ./Core/Sensors/BAR30.o
+ .debug_str     0x0011747c     0x3ed4 ./Core/Sensors/BAR30_CommPorter.o
+ .debug_str     0x0011747c    0xf7370 ./Core/Sensors/BNO055.o
+ .debug_str     0x0011747c     0x3eb9 ./Core/Sensors/BNO055_CommPorter.o
+ .debug_str     0x0011747c     0xb3ea ./Core/Src/custom_memory_manager.o
+ .debug_str     0x0011747c   0x10985e ./Core/Src/main.o
+ .debug_str     0x0011747c     0xbd33 ./Core/Src/microros_allocators.o
+ .debug_str     0x0011747c     0xd6db ./Core/Src/microros_time.o
+ .debug_str     0x0011747c    0xf72bb ./Core/Src/stm32f7xx_hal_msp.o
+ .debug_str     0x0011747c    0xf674c ./Core/Src/stm32f7xx_hal_timebase_tim.o
+ .debug_str     0x0011747c    0xf655f ./Core/Src/stm32f7xx_it.o
+ .debug_str     0x0011747c     0x9a37 ./Core/Src/syscalls.o
+ .debug_str     0x0011747c     0x77d5 ./Core/Src/sysmem.o
+ .debug_str     0x0011747c    0xf5b9b ./Core/Src/system_stm32f7xx.o
+ .debug_str     0x0011747c   0x1003fb ./Core/Src/microros_transports/dma_transport.o
+ .debug_str     0x0011747c       0x8e ./Core/Startup/startup_stm32f767zitx.o
+ .debug_str     0x0011747c    0xf65db ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal.o
+ .debug_str     0x0011747c    0xf65bd ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_cortex.o
+ .debug_str     0x0011747c    0xf5eda ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_dma.o
+ .debug_str     0x0011747c    0xf5c59 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_gpio.o
+ .debug_str     0x0011747c    0xf6dae ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c.o
+ .debug_str     0x0011747c    0xf602d ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c_ex.o
+ .debug_str     0x0011747c    0xf5e3c ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pwr.o
+ .debug_str     0x0011747c    0xf5e0a ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pwr_ex.o
+ .debug_str     0x0011747c    0xf5f16 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc.o
+ .debug_str     0x0011747c    0xf5e79 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc_ex.o
+ .debug_str     0x0011747c    0xf63d5 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_spi.o
+ .debug_str     0x0011747c    0xf6ebe ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim.o
+ .debug_str     0x0011747c    0xf67c4 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim_ex.o
+ .debug_str     0x0011747c    0xf6864 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart.o
+ .debug_str     0x0011747c     0xed50 ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.o
+ .debug_str     0x0011747c     0xaaf9 ./Middlewares/Third_Party/FreeRTOS/Source/list.o
+ .debug_str     0x0011747c     0xc61f ./Middlewares/Third_Party/FreeRTOS/Source/queue.o
+ .debug_str     0x0011747c     0xd0b1 ./Middlewares/Third_Party/FreeRTOS/Source/tasks.o
+ .debug_str     0x0011747c     0xcb4d ./Middlewares/Third_Party/FreeRTOS/Source/timers.o
+ .debug_str     0x0011747c     0x861a ./Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/port.o
+ .debug_str     0x0011747c     0xb316 ./Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.o
 
 .comment        0x00000000       0x76
  .comment       0x00000000       0x76 ./Core/Math/Filters.o

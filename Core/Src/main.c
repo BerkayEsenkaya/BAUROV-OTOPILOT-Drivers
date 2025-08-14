@@ -671,13 +671,13 @@ void TaskMicroROS(void *argument)
 //	  // create node
 	  rclc_node_init_default(&node, "cubemx_node", "", &support);
 
-	  rclc_publisher_init_default(
+	  rclc_publisher_init_best_effort(
 	      &imu_publisher,
 	      &node,
 	      ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, Imu),
 	      "imu_data");
 
-	  rclc_publisher_init_default(
+	  rclc_publisher_init_best_effort(
 	 	  &pressure_publisher,
 	 	  &node,
 	 	  ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, FluidPressure),
@@ -717,7 +717,7 @@ void TaskMicroROS(void *argument)
 
 	    osMutexRelease(microrosMsgMutexHandle);
 
-	    osDelay(100);
+	    osDelay(20);
 	  }
   /* USER CODE END 5 */
 }
