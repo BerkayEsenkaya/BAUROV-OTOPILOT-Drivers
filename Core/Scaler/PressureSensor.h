@@ -14,6 +14,8 @@ typedef struct{
 	uint32_t FilteredPressureDataPascal;
 }PressureSensor_TypeDef_T;
 
+extern PressureSensor_TypeDef_T PressureSensor_1;
+
 void PressureSensor_Init(PressureSensor_TypeDef_T *handle, uint8_t PressureSensorNo, uint8_t I2C_No, uint8_t DevI2C_Address);
 void PressureSensor_Execute(PressureSensor_TypeDef_T *handle, uint8_t PressureSensorNo);
 void PressureSensor_PopulateAllData(PressureSensor_TypeDef_T *handle);

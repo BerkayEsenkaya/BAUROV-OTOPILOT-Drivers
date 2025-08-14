@@ -33,6 +33,7 @@
 #include <std_msgs/msg/int32.h>
 
 #include <sensor_msgs/msg/imu.h>
+#include <sensor_msgs/msg/fluid_pressure.h>
 //#include <geometry_msgs/msg/vector3.h>
 //#include <geometry_msgs/msg/quaternion.h>
 
@@ -41,6 +42,7 @@
 #include "BNO055.h"
 #include "IMU.h"
 #include "RC522.h"
+#include "PressureSensor.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -51,8 +53,10 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 rcl_publisher_t imu_publisher;
+rcl_publisher_t pressure_publisher;
 sensor_msgs__msg__Imu imu_msg;
-osMutexId_t imuMsgMutexHandle;
+sensor_msgs__msg__FluidPressure pressure_msg;
+osMutexId_t microrosMsgMutexHandle;
 
 /* USER CODE END PD */
 
@@ -88,10 +92,17 @@ const osThreadAttr_t Thread_Sensors_attributes = {
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
-/* Definitions for IMU_DataMutex */
-osMutexId_t IMU_DataMutexHandle;
-const osMutexAttr_t IMU_DataMutex_attributes = {
-  .name = "IMU_DataMutex"
+/* Definitions for Thread_LedHandl */
+osThreadId_t Thread_LedHandlHandle;
+const osThreadAttr_t Thread_LedHandl_attributes = {
+  .name = "Thread_LedHandl",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
+/* Definitions for Microros_DataMutex */
+osMutexId_t Microros_DataMutexHandle;
+const osMutexAttr_t Microros_DataMutex_attributes = {
+  .name = "Microros_DataMutex"
 };
 /* USER CODE BEGIN PV */
 
@@ -108,6 +119,7 @@ static void MX_SPI1_Init(void);
 static void MX_TIM3_Init(void);
 void TaskMicroROS(void *argument);
 void TaskSensors(void *argument);
+void TaskLed(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -170,8 +182,8 @@ int main(void)
   /* Init scheduler */
   osKernelInitialize();
   /* Create the mutex(es) */
-  /* creation of IMU_DataMutex */
-  IMU_DataMutexHandle = osMutexNew(&IMU_DataMutex_attributes);
+  /* creation of Microros_DataMutex */
+  Microros_DataMutexHandle = osMutexNew(&Microros_DataMutex_attributes);
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -195,6 +207,9 @@ int main(void)
 
   /* creation of Thread_Sensors */
   Thread_SensorsHandle = osThreadNew(TaskSensors, NULL, &Thread_Sensors_attributes);
+
+  /* creation of Thread_LedHandl */
+  Thread_LedHandlHandle = osThreadNew(TaskLed, NULL, &Thread_LedHandl_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -623,8 +638,10 @@ void TaskMicroROS(void *argument)
 {
   /* USER CODE BEGIN 5 */
 	// micro-ROS configuration
+	rcl_ret_t IMU_ret;
+	rcl_ret_t Pressure_ret;
 
-	  rmw_uros_set_custom_transport(
+	rmw_uros_set_custom_transport(
 	    true,
 	    (void *) &huart2,
 	    cubemx_transport_open,
@@ -643,8 +660,9 @@ void TaskMicroROS(void *argument)
 	  }
 //
 //	  // micro-ROS app
-      static char frame_id[] = "imu_link";
-	  rcl_publisher_t publisher;
+      static char frame_id_imu[] = "imu_link";
+      static char frame_id_pressure[] = "pressure_link";
+//	  rcl_publisher_t publisher;
 //	  std_msgs__msg__Int32 msg;
 	  rclc_support_t support;
 	  rcl_allocator_t allocator;
@@ -660,15 +678,6 @@ void TaskMicroROS(void *argument)
 	  }
 //	  // create node
 	  rclc_node_init_default(&node, "cubemx_node", "", &support);
-//
-//	  // create publisher
-//	  rclc_publisher_init_default(
-//	    &publisher,
-//	    &node,
-//	    ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int32),
-//	    "cubemx_publisher");
-//
-//	  msg.data = 0;
 
 	  rclc_publisher_init_default(
 	      &imu_publisher,
@@ -676,35 +685,45 @@ void TaskMicroROS(void *argument)
 	      ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, Imu),
 	      "imu_data");
 
+	  rclc_publisher_init_default(
+	 	  &pressure_publisher,
+	 	  &node,
+	 	  ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, FluidPressure),
+	 	  "pressure_data");
+
 	  memset(&imu_msg, 0, sizeof(imu_msg));
-	  uint8_t i=0;
+	  memset(&pressure_msg, 0, sizeof(pressure_msg));
+
+
+
 	  for(;;)
 	  {
-//	    rcl_ret_t ret = rcl_publish(&publisher, &msg, NULL);
-//	    if (ret != RCL_RET_OK)
-//	    {
-//	      printf("Error publishing (line %d)\n", __LINE__);
-//	    }
-//
-//	    msg.data++;
-	    i++;
-	    if(i>10){
-	    	i=0;
-	    	HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
-	    }
-
 
 	    imu_msg.header.stamp.sec = rmw_uros_epoch_millis() / 1000;
 	    imu_msg.header.stamp.nanosec = (rmw_uros_epoch_millis() % 1000) * 1000000;
-	    imu_msg.header.frame_id.data = frame_id;
-	    imu_msg.header.frame_id.size = strlen("imu_link");
+	    imu_msg.header.frame_id.data = frame_id_imu;
+	    imu_msg.header.frame_id.size = strlen(frame_id_imu);
 	    imu_msg.header.frame_id.capacity = imu_msg.header.frame_id.size + 1;
 
-	    osMutexAcquire(imuMsgMutexHandle, osWaitForever);
+	    pressure_msg.header.stamp.sec = rmw_uros_epoch_millis() / 1000;
+	    pressure_msg.header.stamp.nanosec = (rmw_uros_epoch_millis() % 1000) * 1000000;
+	    pressure_msg.header.frame_id.data = frame_id_pressure;
+	    pressure_msg.header.frame_id.size = strlen(frame_id_pressure);
+	    pressure_msg.header.frame_id.capacity = pressure_msg.header.frame_id.size + 1;
 
-	    rcl_publish(&imu_publisher, &imu_msg, NULL);
+	    osMutexAcquire(microrosMsgMutexHandle, osWaitForever);
 
-	    osMutexRelease(imuMsgMutexHandle);
+	    IMU_ret = rcl_publish(&imu_publisher, &imu_msg, NULL);
+	    if (IMU_ret != RCL_RET_OK){
+	    	printf("Error publishing (line %d)\n", __LINE__);
+	    }
+
+	    Pressure_ret = rcl_publish(&pressure_publisher, &pressure_msg, NULL);
+	    if (Pressure_ret != RCL_RET_OK){
+	   	    printf("Error publishing (line %d)\n", __LINE__);
+	   	}
+
+	    osMutexRelease(microrosMsgMutexHandle);
 
 	    osDelay(10);
 	  }
@@ -722,53 +741,65 @@ void TaskSensors(void *argument)
 {
   /* USER CODE BEGIN TaskSensors */
 
-	int i=0;
-	ServoAngle = 90;
 	IMU_Init(&IMU_1, 1, I2CNO_3, BNO055_I2C_ADRESS, 0, 0);
+	PressureSensor_Init(&PressureSensor_1, 1, I2CNO_2, 0x40);
 	osDelay(100);
+
   /* Infinite loop */
   for(;;)
   {
-	i++;
-	if(i>=20){
-		HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-		i=0;
-	}
-
 	for(int j = 0; j<180; j+=10){
 		Servo_SetAngle(j);
 		osDelay(10);
 	}
 
-//	Servo_SetAngle(0);
-//	osDelay(10);
-//	Servo_SetAngle(30);
-//	osDelay(10);
-//	Servo_SetAngle(60);
-//	osDelay(10);
-//	Servo_SetAngle(90);
-//	osDelay(10);
-//	Servo_SetAngle(120);
-//	osDelay(10);
-//	Servo_SetAngle(180);
-//    osDelay(10);
-
 	IMU_Execute(&IMU_1, 1);
+	PressureSensor_Execute(&PressureSensor_1, 1);
 
-
-
-
-	osMutexAcquire(imuMsgMutexHandle, osWaitForever);
+	osMutexAcquire(microrosMsgMutexHandle, osWaitForever);
 
 	imu_msg.linear_acceleration.x = IMU_1.CalculatedData.Accelerometer.X_Axis;
 	imu_msg.linear_acceleration.y = IMU_1.CalculatedData.Accelerometer.Y_Axis;
 	imu_msg.linear_acceleration.z = IMU_1.CalculatedData.Accelerometer.Z_Axis;
 
-	osMutexRelease(imuMsgMutexHandle);
+	pressure_msg.fluid_pressure = PressureSensor_1.FilteredPressureDataPascal;
 
-	osDelay(100);
+	osMutexRelease(microrosMsgMutexHandle);
+
+	osDelay(20);
   }
   /* USER CODE END TaskSensors */
+}
+
+/* USER CODE BEGIN Header_TaskLed */
+/**
+* @brief Function implementing the Thread_LedHandl thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_TaskLed */
+void TaskLed(void *argument)
+{
+  /* USER CODE BEGIN TaskLed */
+	uint8_t Led1_cnt=0, Led2_cnt=0, Led3_cnt=0;
+  /* Infinite loop */
+  for(;;)
+  {
+
+	  if(Led1_cnt == 0)
+		  HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, 1);
+
+	  if(Led1_cnt==10)
+		  HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, 0);
+
+	Led1_cnt++;
+
+	if(Led1_cnt==20)
+		Led1_cnt = 0;
+
+    osDelay(50);
+  }
+  /* USER CODE END TaskLed */
 }
 
 /**

@@ -117,7 +117,7 @@ BAR30_ReturnTypeDef_T BAR30_Get_PromValues(BAR30_Sensor_T *handle){
 	uint8_t RxBuff[2], crc = 0;
 
 	for(int i=0; i<7;i++){
-		if(!BAR30_Read(handle, BAR30_COMMANDS_PROM_READ_1 + i*2, RxBuff))
+		if(!BAR30_SendReceive(handle, BAR30_COMMANDS_PROM_READ_1 + i*2, RxBuff, 2))
 			handle->PromParameters.PromData[i]= RxBuff[1] | RxBuff[0]<<8;
 		else
 			return BAR30_ERROR;
