@@ -8,6 +8,8 @@
 #ifndef SCALER_PRESSURESENSOR_H_
 #define SCALER_PRESSURESENSOR_H_
 
+#define PressureSensor_1_I2C_ADDRESS BAR30_I2C_ADDRESS
+
 typedef struct{
 	uint32_t PressureData;//pascal
 	uint32_t TempData;

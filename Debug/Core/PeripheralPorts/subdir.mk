@@ -5,13 +5,16 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../Core/PeripheralPorts/I2C.c 
+../Core/PeripheralPorts/I2C.c \
+../Core/PeripheralPorts/PWM.c 
 
 OBJS += \
-./Core/PeripheralPorts/I2C.o 
+./Core/PeripheralPorts/I2C.o \
+./Core/PeripheralPorts/PWM.o 
 
 C_DEPS += \
-./Core/PeripheralPorts/I2C.d 
+./Core/PeripheralPorts/I2C.d \
+./Core/PeripheralPorts/PWM.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -21,7 +24,7 @@ Core/PeripheralPorts/%.o Core/PeripheralPorts/%.su Core/PeripheralPorts/%.cyclo:
 clean: clean-Core-2f-PeripheralPorts
 
 clean-Core-2f-PeripheralPorts:
-	-$(RM) ./Core/PeripheralPorts/I2C.cyclo ./Core/PeripheralPorts/I2C.d ./Core/PeripheralPorts/I2C.o ./Core/PeripheralPorts/I2C.su
+	-$(RM) ./Core/PeripheralPorts/I2C.cyclo ./Core/PeripheralPorts/I2C.d ./Core/PeripheralPorts/I2C.o ./Core/PeripheralPorts/I2C.su ./Core/PeripheralPorts/PWM.cyclo ./Core/PeripheralPorts/PWM.d ./Core/PeripheralPorts/PWM.o ./Core/PeripheralPorts/PWM.su
 
 .PHONY: clean-Core-2f-PeripheralPorts
 

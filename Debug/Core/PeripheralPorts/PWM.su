@@ -1,0 +1,2 @@
+../Core/PeripheralPorts/PWM.c:15:6:PWM_Init	24	static
+../Core/PeripheralPorts/PWM.c:25:6:PWM_SetPulse	16	static

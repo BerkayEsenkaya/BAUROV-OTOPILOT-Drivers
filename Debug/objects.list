@@ -1,5 +1,6 @@
 "./Core/Math/Filters.o"
 "./Core/PeripheralPorts/I2C.o"
+"./Core/PeripheralPorts/PWM.o"
 "./Core/Scaler/IMU.o"
 "./Core/Scaler/PressureSensor.o"
 "./Core/Sensors/BAR100.o"

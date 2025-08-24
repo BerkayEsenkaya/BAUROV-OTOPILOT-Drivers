@@ -26,14 +26,24 @@
 #include <rcl/error_handling.h>
 #include <rclc/rclc.h>
 #include <rclc/executor.h>
+#include "rclc/sleep.h"  // Micro-ROS sleep header
+//#include <rmw_uros/options.h>
+#include <rcutils/allocator.h>
 #include <uxr/client/transport.h>
 #include <rmw_microxrcedds_c/config.h>
 #include <rmw_microros/rmw_microros.h>
-
+#include <rclc/subscription.h>
 #include <std_msgs/msg/int32.h>
+#include <std_msgs/msg/float32.h>
+#include <rmw/types.h>
+#include <rmw/qos_profiles.h>
 
 #include <sensor_msgs/msg/imu.h>
 #include <sensor_msgs/msg/fluid_pressure.h>
+#include <sensor_msgs/msg/magnetic_field.h>
+
+#include <geometry_msgs/msg/twist.h>
+
 //#include <geometry_msgs/msg/vector3.h>
 //#include <geometry_msgs/msg/quaternion.h>
 
@@ -43,6 +53,7 @@
 #include "IMU.h"
 #include "RC522.h"
 #include "PressureSensor.h"
+#include "PWM.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -52,11 +63,25 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+//extern USBD_HandleTypeDef hUsbDeviceFS;
+
 rcl_publisher_t imu_publisher;
 rcl_publisher_t pressure_publisher;
+rcl_publisher_t magneto_publisher;
+rcl_publisher_t heading_publisher;
+
+rcl_subscription_t cmd_vel_subscriber;
+
+rcl_ret_t spin_rs;
+
 sensor_msgs__msg__Imu imu_msg;
 sensor_msgs__msg__FluidPressure pressure_msg;
-osMutexId_t microrosMsgMutexHandle;
+sensor_msgs__msg__MagneticField magneto_msg;
+std_msgs__msg__Float32 heading_msg;
+
+geometry_msgs__msg__Twist cmd_vel_msg;
+
+//osMutexId_t microrosMsgMutexHandle;
 
 /* USER CODE END PD */
 
@@ -73,6 +98,7 @@ I2C_HandleTypeDef hi2c3;
 SPI_HandleTypeDef hspi1;
 
 TIM_HandleTypeDef htim3;
+TIM_HandleTypeDef htim4;
 
 UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart2_rx;
@@ -92,10 +118,10 @@ const osThreadAttr_t Thread_Sensors_attributes = {
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
-/* Definitions for Thread_LedHandl */
-osThreadId_t Thread_LedHandlHandle;
-const osThreadAttr_t Thread_LedHandl_attributes = {
-  .name = "Thread_LedHandl",
+/* Definitions for Thread_Thruster */
+osThreadId_t Thread_ThrusterHandle;
+const osThreadAttr_t Thread_Thruster_attributes = {
+  .name = "Thread_Thruster",
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
@@ -103,6 +129,11 @@ const osThreadAttr_t Thread_LedHandl_attributes = {
 osMutexId_t Microros_DataMutexHandle;
 const osMutexAttr_t Microros_DataMutex_attributes = {
   .name = "Microros_DataMutex"
+};
+/* Definitions for Microros_cmd_vel_Mutex */
+osMutexId_t Microros_cmd_vel_MutexHandle;
+const osMutexAttr_t Microros_cmd_vel_Mutex_attributes = {
+  .name = "Microros_cmd_vel_Mutex"
 };
 /* USER CODE BEGIN PV */
 
@@ -113,13 +144,14 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_I2C2_Init(void);
-static void MX_USART2_UART_Init(void);
 static void MX_I2C3_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_TIM3_Init(void);
+static void MX_TIM4_Init(void);
+static void MX_USART2_UART_Init(void);
 void TaskMicroROS(void *argument);
 void TaskSensors(void *argument);
-void TaskLed(void *argument);
+void TaskThruster(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -127,17 +159,16 @@ void TaskLed(void *argument);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint16_t ServoAngle = 0;
-void Servo_SetAngle(uint8_t angle) {
-    // SG90 yaklaşık 0°–180° arası çalışır
-    // 0° = 1000 µs, 180° = 2000 µs
-    uint16_t pulse = 1000 + ((angle * 1000) / 180);
-    __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, pulse);
+
+void rclc_sleep_ms(unsigned int milliseconds)
+{
+    osDelay(milliseconds);  // FreeRTOS delay
 }
 
 uint8_t status, str[16], sNum[5];
 char* msg1 = "Reading from card\r\n";
 char* msg2 = "Reading from tag\r\n";
+uint16_t pwm_signal = 1500;
 /* USER CODE END 0 */
 
 /**
@@ -171,10 +202,11 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_I2C2_Init();
-  MX_USART2_UART_Init();
   MX_I2C3_Init();
   MX_SPI1_Init();
   MX_TIM3_Init();
+  MX_TIM4_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -184,6 +216,9 @@ int main(void)
   /* Create the mutex(es) */
   /* creation of Microros_DataMutex */
   Microros_DataMutexHandle = osMutexNew(&Microros_DataMutex_attributes);
+
+  /* creation of Microros_cmd_vel_Mutex */
+  Microros_cmd_vel_MutexHandle = osMutexNew(&Microros_cmd_vel_Mutex_attributes);
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -208,8 +243,8 @@ int main(void)
   /* creation of Thread_Sensors */
   Thread_SensorsHandle = osThreadNew(TaskSensors, NULL, &Thread_Sensors_attributes);
 
-  /* creation of Thread_LedHandl */
-  Thread_LedHandlHandle = osThreadNew(TaskLed, NULL, &Thread_LedHandl_attributes);
+  /* creation of Thread_Thruster */
+  Thread_ThrusterHandle = osThreadNew(TaskThruster, NULL, &Thread_Thruster_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -308,7 +343,7 @@ static void MX_I2C2_Init(void)
 
   /* USER CODE END I2C2_Init 1 */
   hi2c2.Instance = I2C2;
-  hi2c2.Init.Timing = 0x20303E5D;
+  hi2c2.Init.Timing = 0x2010091A;
   hi2c2.Init.OwnAddress1 = 0;
   hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -356,7 +391,7 @@ static void MX_I2C3_Init(void)
 
   /* USER CODE END I2C3_Init 1 */
   hi2c3.Instance = I2C3;
-  hi2c3.Init.Timing = 0x20303E5D;
+  hi2c3.Init.Timing = 0x2010091A;
   hi2c3.Init.OwnAddress1 = 0;
   hi2c3.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c3.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -489,6 +524,68 @@ static void MX_TIM3_Init(void)
 }
 
 /**
+  * @brief TIM4 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM4_Init(void)
+{
+
+  /* USER CODE BEGIN TIM4_Init 0 */
+
+  /* USER CODE END TIM4_Init 0 */
+
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+  TIM_OC_InitTypeDef sConfigOC = {0};
+
+  /* USER CODE BEGIN TIM4_Init 1 */
+
+  /* USER CODE END TIM4_Init 1 */
+  htim4.Instance = TIM4;
+  htim4.Init.Prescaler = 95;
+  htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim4.Init.Period = 19999;
+  htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_PWM_Init(&htim4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 0;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM4_Init 2 */
+  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
+
+  /* USER CODE END TIM4_Init 2 */
+  HAL_TIM_MspPostInit(&htim4);
+
+}
+
+/**
   * @brief USART2 Initialization Function
   * @param None
   * @retval None
@@ -563,9 +660,6 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, LD1_Pin|LD3_Pin|LD2_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_SET);
-
   /*Configure GPIO pin : USER_Btn_Pin */
   GPIO_InitStruct.Pin = USER_Btn_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
@@ -578,21 +672,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : STLK_RX_Pin STLK_TX_Pin */
-  GPIO_InitStruct.Pin = STLK_RX_Pin|STLK_TX_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-  GPIO_InitStruct.Alternate = GPIO_AF7_USART3;
-  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : SPI1_CS_Pin */
-  GPIO_InitStruct.Pin = SPI1_CS_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(SPI1_CS_GPIO_Port, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
   /* USER CODE END MX_GPIO_Init_2 */
@@ -617,6 +696,52 @@ void HAL_Delay(uint32_t Delay)
 {
   osDelay(Delay);
 }
+
+uint16_t map_thrust_to_pwm(float thrust)
+{
+    if (thrust > 1.0f) thrust = 1.0f;
+    if (thrust < -1.0f) thrust = -1.0f;
+
+    uint16_t pwm_neutral = 1500;
+    uint16_t pwm_max = 1900;
+    uint16_t pwm_min = 1100;
+
+    if (thrust >= 0.0f)
+    {
+        // Pozitif thrust: nötr → max
+        return (uint16_t)(pwm_neutral + thrust * (pwm_max - pwm_neutral));
+    }
+    else
+    {
+        // Negatif thrust: nötr → min
+        return (uint16_t)(pwm_neutral + thrust * (pwm_neutral - pwm_min));
+    }
+}
+
+void cmd_vel_callback(const void * msgin)
+{
+    const geometry_msgs__msg__Twist * msg = (const geometry_msgs__msg__Twist *)msgin;
+
+    float linear_x  = msg->linear.x;   // ileri/geri
+    float linear_y  = msg->linear.y;   // sağ/sol
+    float angular_z = msg->angular.z;  // yaw dönmesi
+
+    // Basit thrust dağılımı (ROV’un pervane yönlerine göre katsayıyla ayarlanmalı)
+    float thrust_SA =  linear_x - linear_y - angular_z;  // Sağ Ön
+    float thrust_SB =  linear_x + linear_y - angular_z;  // Sağ Arka
+    float thrust_PA =  linear_x + linear_y + angular_z;  // Sol Ön
+    float thrust_PB =  linear_x - linear_y + angular_z;  // Sol Arka
+
+    // Thrust → PWM dönüşümü (örnek, motor karakteristiğine göre ayarlanmalı)
+    THRUSTER_Vert_R.PWM_Raw = thrust_SA;
+    THRUSTER_Vert_L.PWM_Raw = thrust_SB;
+    THRUSTER_Horz_R.PWM_Raw = thrust_PA;
+    THRUSTER_Horz_L.PWM_Raw = thrust_PB;
+
+    THRUSTER_Vert_R.dataNumb++;
+
+}
+
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_TaskMicroROS */
@@ -629,96 +754,100 @@ void HAL_Delay(uint32_t Delay)
 void TaskMicroROS(void *argument)
 {
   /* USER CODE BEGIN 5 */
-	// micro-ROS configuration
-	rcl_ret_t IMU_ret;
-	rcl_ret_t Pressure_ret;
 
-	rmw_uros_set_custom_transport(
-	    true,
-	    (void *) &huart2,
-	    cubemx_transport_open,
-	    cubemx_transport_close,
-	    cubemx_transport_write,
-	    cubemx_transport_read);
+	static char frame_id_imu[] = "imu_link";
+	static char frame_id_pressure[] = "pressure_link";
+	static char frame_id_magneto[] = "magneto_link";
+	static char frame_id_heading[] = "heading_link";
 
-	  rcl_allocator_t freeRTOS_allocator = rcutils_get_zero_initialized_allocator();
-	  freeRTOS_allocator.allocate = microros_allocate;
-	  freeRTOS_allocator.deallocate = microros_deallocate;
-	  freeRTOS_allocator.reallocate = microros_reallocate;
-	  freeRTOS_allocator.zero_allocate =  microros_zero_allocate;
+	rcl_allocator_t allocator;
+	rclc_support_t support;
+    rcl_node_t node;
+    rclc_executor_t cmd_vel_executor;
 
-	  if (!rcutils_set_default_allocator(&freeRTOS_allocator)) {
-	      printf("Error on default allocators (line %d)\n", __LINE__);
-	  }
-//
-//	  // micro-ROS app
-      static char frame_id_imu[] = "imu_link";
-      static char frame_id_pressure[] = "pressure_link";
-//	  rcl_publisher_t publisher;
-//	  std_msgs__msg__Int32 msg;
-	  rclc_support_t support;
-	  rcl_allocator_t allocator;
-	  rcl_node_t node;
-//
-	  allocator = rcl_get_default_allocator();
-//
-//	  //create init_options
-	  rcl_ret_t ret = rclc_support_init(&support, 0, NULL, &allocator);
-	  if(ret != RCL_RET_OK){
-		  osDelay(10);
+	rmw_uros_set_custom_transport(true, (void *) &huart2, cubemx_transport_open, cubemx_transport_close, cubemx_transport_write, cubemx_transport_read);
 
-	  }
-//	  // create node
-	  rclc_node_init_default(&node, "cubemx_node", "", &support);
+	allocator = rcutils_get_zero_initialized_allocator();
 
-	  rclc_publisher_init_best_effort(
-	      &imu_publisher,
-	      &node,
-	      ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, Imu),
-	      "imu_data");
+	allocator.allocate = microros_allocate;
+	allocator.deallocate = microros_deallocate;
+	allocator.reallocate = microros_reallocate;
+	allocator.zero_allocate = microros_zero_allocate;
 
-	  rclc_publisher_init_best_effort(
-	 	  &pressure_publisher,
-	 	  &node,
-	 	  ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, FluidPressure),
-	 	  "pressure_data");
+	rcutils_set_default_allocator(&allocator);
 
-	  memset(&imu_msg, 0, sizeof(imu_msg));
-	  memset(&pressure_msg, 0, sizeof(pressure_msg));
+	rclc_support_init(&support, 0, NULL, &allocator);
+
+	rclc_node_init_default(&node, "my_node", "", &support);
+
+	//microros sub and pub inits
+
+	rclc_subscription_init_best_effort(&cmd_vel_subscriber, &node, ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist), "cmd_vel");
+
+	rclc_publisher_init_best_effort(&imu_publisher, &node, ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, Imu), "imu_data");
+
+	rclc_publisher_init_best_effort(&pressure_publisher, &node, ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, FluidPressure), "pressure_data");
+
+	rclc_publisher_init_best_effort(&magneto_publisher, &node, ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, MagneticField), "magneto_data");
+
+	rclc_publisher_init_best_effort(&heading_publisher, &node, ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32), "compass_heading");
+
+	//microros executor inits
+	rclc_executor_init(&cmd_vel_executor, &support.context, 1, &allocator);
+
+	rclc_executor_add_subscription(&cmd_vel_executor, &cmd_vel_subscriber, &cmd_vel_msg, &cmd_vel_callback, ALWAYS);
+
+	memset(&imu_msg, 0, sizeof(imu_msg));
+	memset(&pressure_msg, 0, sizeof(pressure_msg));
+	memset(&magneto_msg, 0, sizeof(magneto_msg));
+    memset(&heading_msg, 0, sizeof(heading_msg));
+
+	for(;;){
+
+		imu_msg.header.stamp.sec = rmw_uros_epoch_millis() / 1000;
+		imu_msg.header.stamp.nanosec = (rmw_uros_epoch_millis() % 1000) * 1000000;
+		imu_msg.header.frame_id.data = frame_id_imu;
+		imu_msg.header.frame_id.size = strlen(frame_id_imu);
+		imu_msg.header.frame_id.capacity = imu_msg.header.frame_id.size + 1;
+
+		pressure_msg.header.stamp.sec = rmw_uros_epoch_millis() / 1000;
+		pressure_msg.header.stamp.nanosec = (rmw_uros_epoch_millis() % 1000) * 1000000;
+		pressure_msg.header.frame_id.data = frame_id_pressure;
+		pressure_msg.header.frame_id.size = strlen(frame_id_pressure);
+		pressure_msg.header.frame_id.capacity = pressure_msg.header.frame_id.size + 1;
+
+		magneto_msg.header.stamp.sec = rmw_uros_epoch_millis() / 1000;
+		magneto_msg.header.stamp.nanosec = (rmw_uros_epoch_millis() % 1000) * 1000000;
+		magneto_msg.header.frame_id.data = frame_id_magneto;
+		magneto_msg.header.frame_id.size = strlen(frame_id_magneto);
+		magneto_msg.header.frame_id.capacity = magneto_msg.header.frame_id.size + 1;
+
+		//publish data with mutex
 
 
+		//if(osMutexAcquire(Microros_cmd_vel_MutexHandle, 10) == osOK){
 
-	  for(;;)
-	  {
+		    spin_rs = rclc_executor_spin_some(&cmd_vel_executor, RCL_MS_TO_NS(20));
 
-	    imu_msg.header.stamp.sec = rmw_uros_epoch_millis() / 1000;
-	    imu_msg.header.stamp.nanosec = (rmw_uros_epoch_millis() % 1000) * 1000000;
-	    imu_msg.header.frame_id.data = frame_id_imu;
-	    imu_msg.header.frame_id.size = strlen(frame_id_imu);
-	    imu_msg.header.frame_id.capacity = imu_msg.header.frame_id.size + 1;
+		//	osMutexRelease(Microros_cmd_vel_MutexHandle);
+		//}
 
-	    pressure_msg.header.stamp.sec = rmw_uros_epoch_millis() / 1000;
-	    pressure_msg.header.stamp.nanosec = (rmw_uros_epoch_millis() % 1000) * 1000000;
-	    pressure_msg.header.frame_id.data = frame_id_pressure;
-	    pressure_msg.header.frame_id.size = strlen(frame_id_pressure);
-	    pressure_msg.header.frame_id.capacity = pressure_msg.header.frame_id.size + 1;
 
-	    osMutexAcquire(microrosMsgMutexHandle, osWaitForever);
+/*		if(osMutexAcquire(Microros_DataMutexHandle, 10) == osOK){
 
-	    IMU_ret = rcl_publish(&imu_publisher, &imu_msg, NULL);
-	    if (IMU_ret != RCL_RET_OK){
-	    	printf("Error publishing (line %d)\n", __LINE__);
-	    }
+			rcl_publish(&imu_publisher, &imu_msg, NULL);
 
-	    Pressure_ret = rcl_publish(&pressure_publisher, &pressure_msg, NULL);
-	    if (Pressure_ret != RCL_RET_OK){
-	   	    printf("Error publishing (line %d)\n", __LINE__);
-	   	}
+			rcl_publish(&pressure_publisher, &pressure_msg, NULL);
 
-	    osMutexRelease(microrosMsgMutexHandle);
+			rcl_publish(&magneto_publisher, &magneto_msg, NULL);
 
-	    osDelay(20);
-	  }
+			rcl_publish(&heading_publisher, &heading_msg, NULL);
+
+			osMutexRelease(Microros_DataMutexHandle);
+		}*/
+
+		osDelay(20);
+	}
   /* USER CODE END 5 */
 }
 
@@ -744,50 +873,69 @@ void TaskSensors(void *argument)
 	IMU_Execute(&IMU_1, 1);
 //	PressureSensor_Execute(&PressureSensor_1, 1);
 
-	osMutexAcquire(microrosMsgMutexHandle, osWaitForever);
+	if(osMutexAcquire(Microros_DataMutexHandle, 10) == osOK){
 
-	imu_msg.linear_acceleration.x = IMU_1.CalculatedData.Accelerometer.X_Axis;
-	imu_msg.linear_acceleration.y = IMU_1.CalculatedData.Accelerometer.Y_Axis;
-	imu_msg.linear_acceleration.z = IMU_1.CalculatedData.Accelerometer.Z_Axis;
+	imu_msg.linear_acceleration.x = IMU_1.CalculatedData.LinAcc.X_Axis;
+	imu_msg.linear_acceleration.y = IMU_1.CalculatedData.LinAcc.Y_Axis;
+	imu_msg.linear_acceleration.z = IMU_1.CalculatedData.LinAcc.Z_Axis;
+
+	imu_msg.angular_velocity.x = IMU_1.CalculatedData.Gyroscope.X_Axis;
+	imu_msg.angular_velocity.y = IMU_1.CalculatedData.Gyroscope.Y_Axis;
+	imu_msg.angular_velocity.z = IMU_1.CalculatedData.Gyroscope.Z_Axis;
+
+	imu_msg.orientation.w = IMU_1.CalculatedData.Qua.W_Axis;
+	imu_msg.orientation.x = IMU_1.CalculatedData.Qua.X_Axis;
+	imu_msg.orientation.y = IMU_1.CalculatedData.Qua.Y_Axis;
+	imu_msg.orientation.z = IMU_1.CalculatedData.Qua.Z_Axis;
+
+	magneto_msg.magnetic_field.x = IMU_1.CalculatedData.Magnetometer.X_Axis;
+	magneto_msg.magnetic_field.y = IMU_1.CalculatedData.Magnetometer.Y_Axis;
+	magneto_msg.magnetic_field.z = IMU_1.CalculatedData.Magnetometer.Z_Axis;
 
 	pressure_msg.fluid_pressure = PressureSensor_1.FilteredPressureDataPascal;
 
-	osMutexRelease(microrosMsgMutexHandle);
+	heading_msg.data = IMU_1.CalculatedData.Heading;
+
+	osMutexRelease(Microros_DataMutexHandle);
+	}
 
 	osDelay(10);
   }
   /* USER CODE END TaskSensors */
 }
 
-/* USER CODE BEGIN Header_TaskLed */
+/* USER CODE BEGIN Header_TaskThruster */
 /**
-* @brief Function implementing the Thread_LedHandl thread.
+* @brief Function implementing the Thread_Thruster thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_TaskLed */
-void TaskLed(void *argument)
+/* USER CODE END Header_TaskThruster */
+void TaskThruster(void *argument)
 {
-  /* USER CODE BEGIN TaskLed */
-	uint8_t Led1_cnt=0, Led2_cnt=0, Led3_cnt=0;
+  /* USER CODE BEGIN TaskThruster */
+	PWM_Init(&THRUSTER_Vert_R, &htim4, TIM_CHANNEL_1, 1100, 1900, 1500);
+	PWM_Init(&THRUSTER_Vert_L, &htim4, TIM_CHANNEL_2, 1100, 1900, 1500);
+	PWM_Init(&THRUSTER_Horz_R, &htim4, TIM_CHANNEL_3, 1100, 1900, 1500);
+	PWM_Init(&THRUSTER_Horz_L, &htim4, TIM_CHANNEL_4, 1100, 1900, 1500);
+	osDelay(100);
   /* Infinite loop */
   for(;;)
   {
 
-	  if(Led1_cnt == 0)
-		  HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, 1);
+	//  if(osMutexAcquire(Microros_cmd_vel_MutexHandle, 10) == osOK){
 
-	  if(Led1_cnt==10)
-		  HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, 0);
+		//  PWM_SetPulse(&THRUSTER_Vert_R);
+		 // PWM_SetPulse(&THRUSTER_Vert_L);
+		 // PWM_SetPulse(&THRUSTER_Horz_R);
+		 // PWM_SetPulse(&THRUSTER_Horz_L);
 
-	Led1_cnt++;
+	//	  osMutexRelease(Microros_cmd_vel_MutexHandle);
+	//  }
 
-	if(Led1_cnt==20)
-		Led1_cnt = 0;
-
-    osDelay(50);
+    osDelay(10);
   }
-  /* USER CODE END TaskLed */
+  /* USER CODE END TaskThruster */
 }
 
 /**

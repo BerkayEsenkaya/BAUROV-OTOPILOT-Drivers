@@ -4,6 +4,10 @@
  *  Created on: Aug 13, 2025
  *      Author: Berkay Esenkaya
  */
+
+/**********************************************************
+ * INCLUDES
+ *********************************************************/
 #include <stdint.h>
 #include <math.h>
 
@@ -11,8 +15,12 @@
 #include "BAR30.h"
 #include "BAR30_CommPorter.h"
 
+/**********************************************************
+ * GLOBAL VARIABLES
+ *********************************************************/
 BAR30_Sensor_T BAR30_1 ,BAR30_2, BAR30_3;
 uint32_t tickpre, tickpost, bar30startpressure_tick, readpressure_start_temp_tick, readttemp_and_convert_tick;
+
 /**********************************************************
  * GLOBAL FUNCTIONS
  *********************************************************/

@@ -1,13 +1,5 @@
-/*
- * BAR100.c
- *
- *  Created on: Jul 21, 2025
- *      Author: Berkay Esenkaya
- */
-
-
 /**
- * \file BAR30.c
+ * \file BAR100.c
  * \author Berkay Esenkaya (BAUROV Software Team)
  * \brief BAR30 sensor control functions
  * \date 24.02.2025

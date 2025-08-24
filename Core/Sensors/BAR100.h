@@ -1,10 +1,3 @@
-/*
- * BAR100.h
- *
- *  Created on: Jul 21, 2025
- *      Author: Berkay Esenkaya
- */
-
 #ifndef SENSORS_BAR100_H_
 #define SENSORS_BAR100_H_
 

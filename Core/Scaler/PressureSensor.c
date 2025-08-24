@@ -13,10 +13,16 @@
 
 PressureSensor_TypeDef_T PressureSensor_1;
 
+/** Brief description which ends at this dot. Details follow
+ *  here.
+ */
 void PressureSensor_Init(PressureSensor_TypeDef_T *handle, uint8_t PressureSensorNo, uint8_t I2C_No, uint8_t DevI2C_Address){
 	BAR30_Init(PressureSensorNo, I2C_No, DevI2C_Address);
 }
 
+/** Brief description which ends at this dot. Details follow
+ *  here.
+ */
 void PressureSensor_Execute(PressureSensor_TypeDef_T *handle, uint8_t PressureSensorNo){
 
 	BAR30_Execute(PressureSensorNo);

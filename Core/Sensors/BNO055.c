@@ -20,7 +20,7 @@ void BNO055_Init(BNO055_Sensor_T *handle, uint8_t I2C_No, uint8_t I2C_Adress, vo
 	handle->ResetPort = ResetGPIOPort;
 	handle->ResetPin = ResetGPIOPin;
 	handle->CalcConst.ACC_1MpS2_LSB = 100;
-	handle->CalcConst.GYR_1RPS_LSB = 900;
+	handle->CalcConst.GYR_1RPS_LSB = 180;//900;
 	handle->CalcConst.MAG_1uT_LSB = 16;
 	handle->CalcConst.ACCRange_G = 4;
 	handle->CalcConst.GYRRange_DPS = 500;
@@ -52,14 +52,14 @@ void BNO055_Init(BNO055_Sensor_T *handle, uint8_t I2C_No, uint8_t I2C_Adress, vo
 
 	BNO055_Get_ACC_Mode(handle);
 
-	BNO055_Set_MAG_Mode(handle, BNO055_DATA_MAG_BW_10Hz | BNO055_DATA_MAG_MODE_HIGHACCURACY | BNO055_DATA_MAG_PWRMODE_NORMAL);
+	BNO055_Set_MAG_Mode(handle, BNO055_DATA_MAG_BW_15Hz | BNO055_DATA_MAG_MODE_HIGHACCURACY | BNO055_DATA_MAG_PWRMODE_NORMAL);
 
-	BNO055_Set_GYR_Mode_1(handle, BNO055_DATA_GYR_RANGE_500DPS | BNO055_DATA_GYR_BW_12Hz);
+	BNO055_Set_GYR_Mode_1(handle, BNO055_DATA_GYR_RANGE_500DPS | BNO055_DATA_GYR_BW_64Hz);
 
 	BNO055_Set_GYR_Mode_2(handle, BNO055_DATA_GYR_MODE_NORMAL);
 
 
-	BNO055_Set_OperationMode(handle, BNO055_DATA_OPR_MODE_AMG);
+	BNO055_Set_OperationMode(handle, BNO055_DATA_OPR_MODE_NDOF);
 
 	HAL_Delay(100);
 
@@ -354,6 +354,66 @@ BNO055_ReturnTypeDef_T BNO055_Get_MAG_ID(BNO055_Sensor_T *handle){
         handle->IDs.MAG_ID = RxBuff[0];
 
     return res;
+}
+
+/** Brief description which ends at this dot. Details follow
+ *  here.
+ */
+BNO055_ReturnTypeDef_T BNO055_Get_All_Data(BNO055_Sensor_T *handle){
+	uint8_t Txbuff[1], RxBuff[46];
+	BNO055_ReturnTypeDef_T res = BNO055_ERROR;
+	Txbuff[0] = BNO055_REG_ADDRESS_ACC_X_DATA_LSB;
+
+	BNO055_Get_PageID(handle);
+	if(!handle->PageID)
+		res =BNO055_SendReceive(handle,Txbuff, 1, RxBuff, 44);
+	else{
+		if(!BNO055_Set_PageID(handle, BNO055_PAGE_ID_0))
+			res =BNO055_SendReceive(handle,Txbuff, 1, RxBuff, 44);
+	}
+	if(!res){
+//		if(!(RxBuff[1]>>7)){
+//			if( ((RxBuff[1]>>6)&(0x01)) ){
+//				RxBuff[1] |= 0x80;
+//			}
+//		}
+//		if(!(RxBuff[3]>>7)){
+//			if( ((RxBuff[3]>>6)&(0x01)) ){
+//				RxBuff[3] |= 0x80;
+//			}
+//		}
+//		if(!(RxBuff[5]>>7)){
+//			if( ((RxBuff[5]>>6)&(0x01)) ){
+//				RxBuff[5] |= 0x80;
+//			}
+//		}
+
+		handle->ImuData.ACC_X = (int16_t)((int16_t)(RxBuff[1]<<8) | RxBuff[0]);
+		handle->ImuData.ACC_Y = (int16_t)((int16_t)(RxBuff[3]<<8) | RxBuff[2]);
+		handle->ImuData.ACC_Z = (int16_t)((int16_t)(RxBuff[5]<<8) | RxBuff[4]);
+		handle->ImuData.MAG_X = (int16_t)((int16_t)(RxBuff[7]<<8) | RxBuff[6]);
+		handle->ImuData.MAG_Y =(int16_t)((int16_t)(RxBuff[9]<<8) | RxBuff[8]);
+		handle->ImuData.MAG_Z =(int16_t)((int16_t)(RxBuff[11]<<8) | RxBuff[10]);
+		handle->ImuData.GYR_X =(int16_t)((int16_t)(RxBuff[13]<<8) | RxBuff[12]);
+		handle->ImuData.GYR_Y =(int16_t)((int16_t)(RxBuff[15]<<8) | RxBuff[14]);
+		handle->ImuData.GYR_Z =(int16_t)((int16_t)(RxBuff[17]<<8) | RxBuff[16]);
+		handle->ImuData.Heading =(int16_t)((int16_t)(RxBuff[19]<<8) | RxBuff[18]);
+		handle->ImuData.Roll =(int16_t)((int16_t)(RxBuff[21]<<8) | RxBuff[20]);
+		handle->ImuData.Pitch =(int16_t)((int16_t)(RxBuff[23]<<8) | RxBuff[22]);
+		handle->ImuData.QUA_W =(int16_t)((int16_t)(RxBuff[25]<<8) | RxBuff[24]);
+		handle->ImuData.QUA_X =(int16_t)((int16_t)(RxBuff[27]<<8) | RxBuff[26]);
+		handle->ImuData.QUA_Y =(int16_t)((int16_t)(RxBuff[29]<<8) | RxBuff[28]);
+		handle->ImuData.QUA_Z =(int16_t)((int16_t)(RxBuff[31]<<8) | RxBuff[30]);
+		handle->ImuData.LINACC_X =(int16_t)((int16_t)(RxBuff[33]<<8) | RxBuff[32]);
+		handle->ImuData.LINACC_Y =(int16_t)((int16_t)(RxBuff[35]<<8) | RxBuff[34]);
+		handle->ImuData.LINACC_Z =(int16_t)((int16_t)(RxBuff[37]<<8) | RxBuff[36]);
+		handle->ImuData.GRV_X =(int16_t)((int16_t)(RxBuff[39]<<8) | RxBuff[38]);
+		handle->ImuData.GRV_Y =(int16_t)((int16_t)(RxBuff[41]<<8) | RxBuff[40]);
+		handle->ImuData.GRV_Z=(int16_t)((int16_t)(RxBuff[43]<<8) | RxBuff[42]);
+		handle->ImuData.MAG_X =(int16_t)((int16_t)(RxBuff[45]<<8) | RxBuff[44]);
+
+	}
+	return res;
 }
 
 /** Brief description which ends at this dot. Details follow

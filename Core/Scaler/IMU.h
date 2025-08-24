@@ -17,9 +17,22 @@ typedef struct{
 }IMU_AxisSigned_T;
 
 typedef struct{
+	int16_t W_Axis;
+	int16_t X_Axis;
+	int16_t Y_Axis;
+	int16_t Z_Axis;
+}IMU_QuaAxisSigned_T;
+
+typedef struct{
 	IMU_AxisSigned_T Accelerometer;
 	IMU_AxisSigned_T Gyroscope;
 	IMU_AxisSigned_T Magnetometer;
+	float Heading;
+	float Roll;
+	float Pitch;
+	IMU_QuaAxisSigned_T Qua;
+	IMU_AxisSigned_T LinAcc;
+	IMU_AxisSigned_T Grv;
 }IMU_SignedData_T;
 
 typedef struct{
@@ -29,9 +42,22 @@ typedef struct{
 }IMU_AxisFloat_T;
 
 typedef struct{
+	float W_Axis;
+	float X_Axis;
+	float Y_Axis;
+	float Z_Axis;
+}IMU_QUAAxisFloat_T;
+
+typedef struct{
 	IMU_AxisFloat_T Accelerometer;
 	IMU_AxisFloat_T Gyroscope;
 	IMU_AxisFloat_T Magnetometer;
+	float Heading;
+	float Roll;
+	float Pitch;
+	IMU_QUAAxisFloat_T Qua;
+	IMU_AxisFloat_T LinAcc;
+	IMU_AxisFloat_T Grv;
 }IMU_FloatData_T;
 
 typedef struct{
